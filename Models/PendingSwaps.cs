@@ -8,41 +8,23 @@ namespace PrisonerExchange.Services;
 
 public class PendingSwap
 {
-	public UserModel Initiator { get; }
-	public UserModel TargetUser { get; }
+	public UserModel Seller { get; }
+	public UserModel Buyer { get; }
 
-	// The type of prisoner the initiator wants from the target
-	public string RequestedPrisonerType { get; }
-
-	public string RequestedBloodType { get; }
-	public int RequestedBloodQuality { get; }
-
-	// Reference for the prison cell holding the initiator's prisoner
-	public Entity InitiatorPrisonCell { get; }
+	public PrisonerModel PrisonerA { get; }
+	public PrisonerModel PrisonerB { get; }
 
 	public DateTime CreatedAt { get; }
-	public double LifeTimeSeconds { get; }
+	public double LifetimeSeconds { get; }
 
-	public PendingSwap(
-			UserModel initiator,
-			UserModel targetUser,
-			string requestedPrisonerType,
-			string requestedBloodType,
-			int requestedBloodQuality,
-			Entity initiatorPrisonCell,
-			DateTime createdAt,
-			double lifeTimeSeconds
-	)
+	public PendingSwap(UserModel seller, UserModel buyer, PrisonerModel prisonera, PrisonerModel prisonerb, double lifetimeSeconds = 120)
 	{
-		Initiator = initiator;
-		TargetUser = targetUser;
+		Seller = seller;
+		Buyer = buyer;
+		PrisonerA = prisonera;
+		PrisonerB = prisonerb;
 
-		RequestedPrisonerType = requestedPrisonerType;
-		RequestedBloodType = requestedBloodType;
-		RequestedBloodQuality = requestedBloodQuality;
-
-		InitiatorPrisonCell = initiatorPrisonCell;
-		CreatedAt = createdAt;
-		LifeTimeSeconds = lifeTimeSeconds;
+		CreatedAt = DateTime.UtcNow;
+		LifetimeSeconds = lifetimeSeconds;
 	}
 }

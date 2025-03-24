@@ -13,7 +13,7 @@ namespace PrisonerExchange.Services;
 
 public static class SwapService
 {
-	private static readonly List<PendingSwap> Swaps = new();
+	private static readonly List<PendingSwap> SwapsList = new();
 	private static readonly Timer CleanupTimer;
 
 	static SwapService()
@@ -26,95 +26,83 @@ public static class SwapService
 
 	public static void AddSwap(PendingSwap swap)
 	{
-		lock (Swaps)
-		{
-			Swaps.Add(swap);
-		}
-		Plugin.Logger.Info("SwapService", $"Created prisoner swap. Initiator={swap.Initiator.CharacterName}, Target={swap.TargetUser.CharacterName}");
+		SwapsList.Add(swap);
+		Plugin.Logger.Info("SwapService", $"Created prisoner swap. Initiator={swap.Seller.CharacterName}, Target={swap.Buyer.CharacterName}");
 	}
 
 	public static List<PendingSwap> GetAll()
 	{
-		lock (Swaps)
-		{
-			return Swaps.ToList();
-		}
+		return [.. SwapsList];
 	}
 
-	public static PendingSwap GetSwapByInitiator(UserModel user)
+	public static PendingSwap GetSwapBySeller(UserModel user)
 	{
-		lock (Swaps)
-		{
-			return Swaps.FirstOrDefault(s => s.Initiator.PlatformId == user.PlatformId);
-		}
+		return SwapsList.FirstOrDefault(s => s.Seller.PlatformId == user.PlatformId);
 	}
 
 	public static PendingSwap GetSwapByTarget(UserModel user)
 	{
-		lock (Swaps)
-		{
-			return Swaps.FirstOrDefault(s => s.TargetUser.PlatformId == user.PlatformId);
-		}
+		return SwapsList.FirstOrDefault(s => s.Buyer.PlatformId == user.PlatformId);
 	}
 
 	public static bool SwapExists(UserModel user)
 	{
-		lock (Swaps)
+		lock (SwapsList)
 		{
-			return Swaps.Any(s => s.Initiator.PlatformId == user.PlatformId ||
-														s.TargetUser.PlatformId == user.PlatformId);
+			return SwapsList.Any(s => s.Seller.PlatformId == user.PlatformId ||
+														s.Buyer.PlatformId == user.PlatformId);
 		}
 	}
 
-	public static void RemoveSwap(UserModel initiator)
+	public static void RemoveSwap(UserModel seller)
 	{
-		lock (Swaps)
+		lock (SwapsList)
 		{
-			var existing = GetSwapByInitiator(initiator);
+			var existing = GetSwapBySeller(seller);
 			if (existing != null)
 			{
-				Swaps.Remove(existing);
+				SwapsList.Remove(existing);
 				Plugin.Logger.Info("SwapService",
-						$"Removed prisoner swap from initiator={initiator.CharacterName}");
+						$"Removed prisoner swap from initiator={seller.CharacterName}");
 			}
 		}
 	}
 
 	public static void ClearAll()
 	{
-		lock (Swaps)
+		lock (SwapsList)
 		{
-			Swaps.Clear();
+			SwapsList.Clear();
 		}
 	}
 
 	private static void RemoveExpiredSwaps()
 	{
-		lock (Swaps)
+		lock (SwapsList)
 		{
-			var expired = Swaps
+			var expired = SwapsList
 					.Where(s => (DateTime.UtcNow - s.CreatedAt).TotalSeconds >= s.LifeTimeSeconds)
 					.ToList();
 
 			foreach (var ex in expired)
 			{
-				Swaps.Remove(ex);
+				SwapsList.Remove(ex);
 
 				// Inform both sides that it expired
-				if (ex.Initiator.User.IsConnected)
+				if (ex.Seller.User.IsConnected)
 				{
-					var msg = $"{Markup.Prefix}Your prisoner swap request with {ex.TargetUser.CharacterName} has expired.";
-					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Initiator.User, msg);
+					var msg = $"{Markup.Prefix}Your prisoner swap request with {ex.Buyer.CharacterName} has expired.";
+					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Seller.User, msg);
 				}
-				if (ex.TargetUser.User.IsConnected)
+				if (ex.Buyer.User.IsConnected)
 				{
-					var msg = $"{Markup.Prefix}A prisoner swap request from {ex.Initiator.CharacterName} has expired.";
-					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.TargetUser.User, msg);
+					var msg = $"{Markup.Prefix}A prisoner swap request from {ex.Seller.CharacterName} has expired.";
+					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Buyer.User, msg);
 				}
 
-				// Remove buff from the initiator’s prisoner
-				var cellData = Core.EntityManager.GetComponentData<global::ProjectM.PrisonCell>(ex.InitiatorPrisonCell);
-				BuffUtil.RemoveBuff(cellData.ImprisonedEntity._Entity, BuffUtil.electricBuff);
+				// Trt remove buff from both prisoners
+				BuffUtil.RemoveBuff(ex.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+				BuffUtil.RemoveBuff(ex.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
 			}
 		}
 	}

@@ -1,5 +1,10 @@
 ﻿using System;
 
+using ProjectM.Network;
+
+using Unity.Collections;
+using Unity.Entities;
+
 using VampireCommandFramework;
 
 namespace PrisonerExchange.Services.Chat;
@@ -10,7 +15,7 @@ public static class PromptHelper
 	{
 		ulong userId = ctx.Event.User.PlatformId;
 
-		if (!string.IsNullOrEmpty(instruction))
+		if (instruction != null)
 		{
 			ctx.Reply(instruction);
 		}

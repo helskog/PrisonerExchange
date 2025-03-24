@@ -108,7 +108,7 @@ public class PrisonerService
 				prisonCellEntity.Write(prisonstation);
 
 				// ImprisonedBuff
-				BuffUtil.BuffNPC(e, receiver.Entity, BuffUtil.electricBuff, -1);
+				BuffUtil.BuffNPC(e, receiver.Entity, BuffUtil.ELECTRIC_BUFF, -1);
 			},
 			center.y
 			);

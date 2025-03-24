@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using PrisonerExchange.Extensions;
-using PrisonerExchange.Models;
 using PrisonerExchange.Services;
-using PrisonerExchange.Services.Chat;
-using PrisonerExchange.Utility;
 
 using VampireCommandFramework;
 
@@ -18,45 +13,10 @@ internal class AdminCommands
 	/// <summary>
 	/// Test command for development.
 	/// </summary>
-	[Command("pe swap", description: "temporary", adminOnly: true)]
-	public void CheckPrisoners(ChatCommandContext ctx, string username)
+
+	[Command("pe test", description: "temporary", adminOnly: true)]
+	public void testCommand(ChatCommandContext ctx)
 	{
-		UserModel initiator = UserUtil.GetCurrentUser(ctx);
-		UserModel target = UserUtil.GetUserByCharacterName(username);
-
-		if (PromptManager.IsWaiting(initiator.PlatformId))
-			return;
-
-		if (target == null || !target.User.IsConnected)
-		{
-			ctx.Reply($"{Markup.Prefix}User is invalid or offline.");
-		}
-
-		PrisonerModel selectedPrisoner = null;
-		List<PrisonerModel> prisonerList = PrisonerService.GetPrisonerList(target);
-
-		// Send formatted message to initiator
-		Services.Chat.StringBuilders.SendPrisonerList(ctx, prisonerList);
-
-		PromptHelper.UserInput(ctx, id =>
-		{
-			if (!int.TryParse(id, out var selection))
-			{
-				ctx.Reply("Something went wrong with the selection, please try again.");
-				Plugin.Logger.Error("SwapService", "Could not convert string to int.");
-				return;
-			}
-
-			if (selection < 0 || selection > prisonerList.Count + 1)
-			{
-				ctx.Reply("Invalid selection.");
-				return;
-			}
-
-			selectedPrisoner = prisonerList[selection - 1];
-
-			ctx.Reply($"User selected: {selectedPrisoner.Info.UnitType} with {selectedPrisoner.Info.BloodQuality}% {selectedPrisoner.Info.BloodType}!");
-		});
 	}
 
 	/// <summary>

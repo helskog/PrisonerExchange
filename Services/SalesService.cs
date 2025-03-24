@@ -12,64 +12,72 @@ namespace PrisonerExchange.Services;
 
 public static class SalesService
 {
-	private static readonly List<PendingSale> list = new List<PendingSale>();
-	private static Timer cleanupTimer;
+	private static readonly List<PendingSale> SalesList = new List<PendingSale>();
+	private static Timer CleanupTimer;
 
 	static SalesService()
 	{
-		cleanupTimer = new Timer(5_000);
-		cleanupTimer.Elapsed += (s, e) => RemoveExpiredSales();
-		cleanupTimer.AutoReset = true;
-		cleanupTimer.Enabled = true;
+		CleanupTimer = new Timer(5_000);
+		CleanupTimer.Elapsed += (s, e) => RemoveExpiredSales();
+		CleanupTimer.AutoReset = true;
+		CleanupTimer.Enabled = true;
 	}
 
 	public static void AddSale(PendingSale sale)
 	{
-		list.Add(sale);
+		SalesList.Add(sale);
 		Plugin.Logger.Info("SalesService", $"Prisoner exchange created : Seller={sale.Seller.CharacterName}, Buyer={sale.Buyer.CharacterName}, Price={sale.Price}");
-	}
-
-	public static void RemoveSale(UserModel seller)
-	{
-		var sale = GetSaleBySeller(seller);
-
-		if (sale != null)
-		{
-			list.Remove(sale);
-			Plugin.Logger.Info("SalesService", $"Prisoner exchange removed : Seller={sale.Seller.CharacterName}, Buyer={sale.Buyer.CharacterName}");
-		}
 	}
 
 	public static List<PendingSale> GetAll()
 	{
-		return list;
+		return [.. SalesList];
 	}
 
 	public static PendingSale GetSaleBySeller(UserModel seller)
 	{
-		return list.FirstOrDefault(s => s.Seller.PlatformId == seller.PlatformId);
+		return SalesList.FirstOrDefault(s => s.Seller.PlatformId == seller.PlatformId);
 	}
 
 	public static PendingSale GetSaleByBuyer(UserModel buyer)
 	{
-		return list.FirstOrDefault(s => s.Buyer.PlatformId == buyer.PlatformId);
+		return SalesList.FirstOrDefault(s => s.Buyer.PlatformId == buyer.PlatformId);
+	}
+
+	public static void RemoveSale(UserModel seller)
+	{
+		lock (SalesList)
+		{
+			var sale = GetSaleBySeller(seller);
+			if (sale != null)
+			{
+				SalesList.Remove(sale);
+				Plugin.Logger.Info("SalesService", $"Prisoner exchange removed : Seller={sale.Seller.CharacterName}, Buyer={sale.Buyer.CharacterName}");
+			}
+		}
 	}
 
 	public static void ClearAll()
 	{
-		list.Clear();
+		lock (SalesList)
+		{
+			SalesList.Clear();
+		}
 	}
 
 	public static bool SaleExists(UserModel user)
 	{
-		return SalesService.GetAll().Any(sale => sale.Seller.PlatformId == user.PlatformId);
+		lock (SalesList)
+		{
+			return SalesService.GetAll().Any(sale => sale.Seller.PlatformId == user.PlatformId);
+		}
 	}
 
 	public static void RemoveExpiredSales()
 	{
-		lock (list)
+		lock (SalesList)
 		{
-			foreach (var expired in list.Where(sale => (DateTime.UtcNow - sale.CreatedAt).TotalSeconds >= sale.LifetimeSeconds).ToList())
+			foreach (var expired in SalesList.Where(sale => (DateTime.UtcNow - sale.CreatedAt).TotalSeconds >= sale.LifetimeSeconds).ToList())
 			{
 				// Notify players
 				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Seller.User,
@@ -78,7 +86,7 @@ public static class SalesService
 				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Buyer.User,
 						$"{Markup.Prefix}The prisoner exchange request from {expired.Seller.CharacterName} has expired.");
 
-				list.Remove(expired);
+				SalesList.Remove(expired);
 			}
 		}
 	}

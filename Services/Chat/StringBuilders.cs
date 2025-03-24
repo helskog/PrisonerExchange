@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-using PrisonerExchange.Data;
 using PrisonerExchange.Models;
 
 using ProjectM;
@@ -38,14 +36,17 @@ public class StringBuilders
 		return sb.ToString();
 	}
 
-	public static string SwapsInfoMessage(PendingSwap swap)
+	public static string SwapInfoMessage(PendingSwap swap)
 	{
-		return
-				$"<size=15><color=yellow>Prisoner swap request</color></size>\n" +
-				$"From: {Markup.Highlight(swap.Initiator.CharacterName)}\n" +
-				$"They want: {Markup.Highlight($"{swap.RequestedPrisonerType} {swap.RequestedBloodType} {swap.RequestedBloodQuality}%")}\n" +
-				$"They are offering the prisoner in their near cell.\n" +
-				$"Type {Markup.Highlight(".pe swap accept")} (while near your own prisoner) or {Markup.Highlight(".pe swap decline")} to respond.";
+		var sb = new StringBuilder();
+		sb.AppendLine($"<size=15><color=yellow>Prisoner exchange request</color></size>");
+		sb.AppendLine($"From: {Markup.Highlight(swap.Seller.CharacterName)}");
+		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType} {swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}")}");
+		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType} {swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}")}");
+		sb.AppendLine();
+		sb.AppendLine($"Type {Markup.Highlight(".pe accept")}");
+
+		return sb.ToString();
 	}
 
 	/// <summary>

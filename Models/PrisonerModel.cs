@@ -17,6 +17,8 @@ public class PrisonerModel
 		prisonerEntity = prisoner;
 	}
 
+	public Entity PrisonerEntity => prisonerEntity;
+
 	public PrisonerInformation Info
 	{
 		get

@@ -12,7 +12,7 @@ namespace PrisonerExchange.Utility;
 public class BuffUtil
 {
 	public static EntityManager EM = Core.EntityManager;
-	public static PrefabGUID electricBuff = new PrefabGUID(1237097606);
+	public static PrefabGUID ELECTRIC_BUFF = new PrefabGUID(1237097606);
 
 	public const int NO_DURATION = 0;
 	public const int DEFAULT_DURATION = -1;
@@ -89,6 +89,7 @@ public class BuffUtil
 			return true;
 		}
 
+		Plugin.Logger.Info("BuffUtil", $"Successfully removed buff {Buff.GuidHash} from entity {Character.Index}.");
 		return false;
 	}
 }

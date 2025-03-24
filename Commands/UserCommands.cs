@@ -95,7 +95,7 @@ public class UserCommands
 
 		Entity unitEntity = prisonCellData.ImprisonedEntity._Entity;
 
-		var newSale = new PendingSale(
+		PendingSale newSale = new(
 			seller: localuser,
 			prisonerEntity: unitEntity,
 			buyer: targetuser,
@@ -108,8 +108,7 @@ public class UserCommands
 		Plugin.Logger.Info("UserCommands", $"User '{localuser.CharacterName}' initiated prisoner sale to '{targetuser.CharacterName}' for {price} {Configuration.CurrencyName}.");
 
 		// Buff active request NPC to visualize.
-		if (!BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.electricBuff, 120))
-			Plugin.Logger.Error("UserCommands", $"Failed to apply buff to '{unitEntity}'");
+		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
 
 		// Send message to receiving user.
 		string msg = Services.Chat.StringBuilders.SalesInfoMessage(newSale);
@@ -136,7 +135,7 @@ public class UserCommands
 			return;
 		}
 
-		if (!BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.electricBuff))
+		if (!BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF))
 			Plugin.Logger.Error("UserCommands", $"Failed to apply buff to {sale.PrisonerEntity}.");
 
 		SalesService.RemoveSale(localuser);
