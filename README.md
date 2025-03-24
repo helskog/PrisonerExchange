@@ -1,6 +1,18 @@
 # PrisonerExchange
 
-# Credits
+## Commands
+<details>
+<summary><strong>Staff Commands</strong></summary>
+
+- `.pe list sales` List all active prisoner sale requests between users.
+- `.pe list swaps` List all active prisoner swap requests between users.
+- `.pe clear sales` Clear all active prisoner sale requests between users.
+- `.pe clear swaps` Clear all active prisoner swap requests between users.
+- `.pe remove (username)` Remove any sale/swap request from a specified user. 
+
+</details>
+
+## Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Cmmunity. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
 > **[Deca](https://github.com/decaprime)** for their work on **Bloodstone** and **VampireCommandFramework**
