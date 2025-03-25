@@ -2,7 +2,6 @@
 using System.Text;
 
 using PrisonerExchange.Models;
-using PrisonerExchange.Services;
 
 using ProjectM;
 
@@ -27,7 +26,7 @@ public class StringBuilders
 
 		var sb = new StringBuilder();
 		sb.AppendLine($"<size=15><color=yellow>Prisoner sale request</color></size>");
-		sb.AppendLine($"From: {Markup.Highlight(sale.Seller.CharacterName)}");
+		sb.AppendLine($"From user: {Markup.Highlight(sale.Seller.CharacterName)}");
 		sb.AppendLine($"Price: {Markup.Highlight(sale.Price)} {Configuration.CurrencyName}");
 		sb.AppendLine($"Prisoner type: {prisonerInfo.UnitType}");
 		sb.AppendLine($"Prisoner blood: {Markup.Highlight($"{prisonerInfo.BloodQuality}% {prisonerInfo.BloodType}")}");
@@ -41,9 +40,9 @@ public class StringBuilders
 	{
 		var sb = new StringBuilder();
 		sb.AppendLine($"<size=15><color=yellow>Prisoner swap request</color></size>");
-		sb.AppendLine($"From: {Markup.Highlight(swap.Seller.CharacterName)}");
-		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType} {swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}")}");
-		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType} {swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}")}");
+		sb.AppendLine($"From user: {Markup.Highlight(swap.Seller.CharacterName)}");
+		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType}")}" + Markup.Secondary($"{swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}"));
+		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType}")}" + Markup.Secondary($"{swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}"));
 		sb.AppendLine();
 		sb.AppendLine($"Type {Markup.Highlight(".pe swap accept")} to complete the swap.");
 

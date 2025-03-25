@@ -27,9 +27,21 @@ internal class SwapCommands
 		var localuser = UserUtil.GetCurrentUser(ctx);
 		var targetuser = UserUtil.GetUserByCharacterName(username);
 
-		if (localuser == null || targetuser == null || !targetuser.User.IsConnected)
+		if (SwapService.SwapExists(localuser) || SwapService.SwapExists(targetuser))
+		{
+			ctx.Reply($"{Markup.Prefix}Both users must not be in an active exchange!");
+			return;
+		}
+
+		if (localuser == null || targetuser == null)
 		{
 			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
+			return;
+		}
+
+		if (!localuser.User.IsConnected || !targetuser.User.IsConnected)
+		{
+			ctx.Reply($"{Markup.Prefix}Both users need to be online!");
 			return;
 		}
 

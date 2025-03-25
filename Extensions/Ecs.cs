@@ -25,20 +25,6 @@ namespace PrisonerExchange.Extensions
 			return EM.HasComponent<T>(entity);
 		}
 
-		public static bool SameTeam(this Entity entityA, Entity entityB)
-		{
-			if (!entityA.Exists() || !entityB.Exists())
-				return false;
-
-			if (!entityA.Has<Team>() || !entityB.Has<Team>())
-				return false;
-
-			var teamA = entityA.Read<Team>();
-			var teamB = entityB.Read<Team>();
-
-			return teamA.Value == teamB.Value;
-		}
-
 		public static bool TryGetComponent<T>(this Entity entity, out T component) where T : struct
 		{
 			if (EM.HasComponent<T>(entity))

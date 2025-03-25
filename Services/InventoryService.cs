@@ -2,6 +2,7 @@
 using PrisonerExchange.Models;
 
 using ProjectM;
+using ProjectM.Scripting;
 
 using Stunlock.Core;
 
@@ -15,6 +16,11 @@ public class InventoryService
 
 	public static AddItemResponse TryAddUserInventoryItem(Entity CharacterEntity, PrefabGUID itemGuid, int stacks)
 	{
+		if (Core.ServerScriptMapper == null)
+		{
+			Core.ServerScriptMapper = Core.Server.GetExistingSystemManaged<ServerScriptMapper>();
+		}
+
 		return Core.ServerScriptMapper.GetServerGameManager().TryAddInventoryItem(CharacterEntity, itemGuid, stacks);
 	}
 
