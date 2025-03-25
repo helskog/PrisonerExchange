@@ -18,9 +18,8 @@ namespace PrisonerExchange.Commands;
 internal class SaleCommands
 {
 	/// <summary>
-	/// Make an offer to sell prisoner to another user.
+	/// Make an offer to sell a prisoner to another user.
 	/// </summary>
-
 	[Command("sell", description: "Sell a prisoner for a price.")]
 	public static void ExchangeCommand(ChatCommandContext ctx, string username, int price)
 	{

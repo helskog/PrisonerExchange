@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 using PrisonerExchange.Services;
+using PrisonerExchange.Services.Chat;
 using PrisonerExchange.Utility;
 
 using VampireCommandFramework;
@@ -39,11 +40,9 @@ internal class AdminCommands
 
 		if (swap != null)
 		{
-			// Remove the electric buff from both prisoners
 			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
 			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
 
-			// Remove the swap
 			SwapService.RemoveSwap(swap.Seller);
 			ctx.Reply($"{Markup.Prefix}Removed swap request involving {user.CharacterName}.");
 			return;
@@ -62,5 +61,22 @@ internal class AdminCommands
 		SwapService.ClearAll();
 
 		ctx.Reply($"{Markup.Prefix}Cleared all active prisoner sales and swaps!");
+	}
+
+	/// <summary>
+	/// Clears all active cooldowns on specific user
+	/// </summary>
+	[Command("removecooldown", "Removes command cooldowns for a user")]
+	public static void RemoveCooldownCommand(ChatCommandContext ctx, string targetUserName)
+	{
+		var targetUser = UserUtil.GetUserByCharacterName(targetUserName);
+		if (targetUser == null)
+		{
+			ctx.Reply($"{Markup.Prefix}Could not find user {targetUserName}.");
+			return;
+		}
+
+		ctx.Reply($"{Markup.Prefix}Removed all cooldowns for user {targetUserName}.");
+		CooldownTracker.ClearAllCooldowns(targetUser.PlatformId);
 	}
 }

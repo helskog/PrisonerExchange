@@ -32,4 +32,13 @@ public static class CooldownTracker
 		var nextAllowed = DateTime.UtcNow.Add(TimeSpan.FromMinutes(Configuration.CommandCoolDownPeriod));
 		cooldowns[(userId, commandName)] = nextAllowed;
 	}
+
+	public static void ClearAllCooldowns(ulong userId)
+	{
+		foreach (var key in cooldowns.Keys)
+		{
+			if (key.UserId == userId)
+				cooldowns.TryRemove(key, out _);
+		}
+	}
 }

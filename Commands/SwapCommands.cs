@@ -24,22 +24,22 @@ internal class SwapCommands
 		var localuser = UserUtil.GetCurrentUser(ctx);
 		var targetuser = UserUtil.GetUserByCharacterName(username);
 
+		if (localuser == null || targetuser == null)
+		{
+			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
+			return;
+		}
+
 		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "swap"))
 		{
 			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "swap");
-			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using .pe swap");
+			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using .pe swap again.");
 			return;
 		}
 
 		if (SwapService.SwapExists(localuser) || SwapService.SwapExists(targetuser))
 		{
 			ctx.Reply($"{Markup.Prefix}Both users must not be in an active exchange!");
-			return;
-		}
-
-		if (localuser == null || targetuser == null)
-		{
-			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
 			return;
 		}
 
@@ -52,7 +52,7 @@ internal class SwapCommands
 		var prisonerList = PrisonerService.GetPrisonerList(targetuser);
 		if (prisonerList.Count == 0)
 		{
-			ctx.Reply($"{Markup.Prefix}Target user has no prisoners.");
+			ctx.Reply($"{Markup.Prefix}{username} has no prisoners.");
 			return;
 		}
 
@@ -62,7 +62,7 @@ internal class SwapCommands
 		{
 			if (!int.TryParse(input, out var selection) || selection < 1 || selection > prisonerList.Count)
 			{
-				ctx.Reply($"{Markup.Prefix}Invalid selection.");
+				ctx.Reply($"{Markup.Prefix}Invalid selection, please select one of the prisoners in the list.");
 				return;
 			}
 
@@ -80,6 +80,12 @@ internal class SwapCommands
 			if (!PrisonerService.HasPrisoner(prisonCellEntity))
 			{
 				ctx.Reply($"{Markup.Prefix}Your prison cell is empty.");
+				return;
+			}
+
+			if (!prisonCellEntity.SameTeam(localuser.Entity))
+			{
+				ctx.Reply($"{Markup.Prefix}You cannot swap another clans prisoner!");
 				return;
 			}
 
