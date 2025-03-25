@@ -14,7 +14,7 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Commands;
 
-[CommandGroup("prisonerexchange", "pe")]
+[CommandGroup("pe", "prisonerexchange")]
 internal class SaleCommands
 {
 	/// <summary>
@@ -26,6 +26,13 @@ internal class SaleCommands
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
 		UserModel targetuser = UserUtil.GetUserByCharacterName(username);
+
+		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "sell"))
+		{
+			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "sell");
+			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using /swap accept again!");
+			return;
+		}
 
 		if (targetuser == null)
 		{
@@ -45,17 +52,17 @@ internal class SaleCommands
 			return;
 		}
 
-		//if (localuser.Equals(targetuser))
-		//{
-		//	ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
-		//	return;
-		//}
+		if (localuser.Equals(targetuser))
+		{
+			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
+			return;
+		}
 
-		//if (localuser.Entity.SameTeam(targetuser.Entity))
-		//{
-		//	ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
-		//	return;
-		//}
+		if (localuser.Entity.SameTeam(targetuser.Entity))
+		{
+			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
+			return;
+		}
 
 		Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 5);
 
@@ -116,6 +123,8 @@ internal class SaleCommands
 
 		// Inform sender that the offer has been sent.
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, $"{Markup.Prefix}Request sent to user {targetuser.CharacterName}");
+
+		CooldownTracker.SetCooldown(localuser.PlatformId, "sell");
 	}
 
 	/// <summary>

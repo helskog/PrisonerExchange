@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using PrisonerExchange.Extensions;
+﻿using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
 using PrisonerExchange.Services.Chat;
@@ -15,7 +12,7 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Commands;
 
-[CommandGroup("prisonerexchange", "pe")]
+[CommandGroup("pe", "prisonerexchange")]
 internal class SwapCommands
 {
 	/// <summary>
@@ -26,6 +23,13 @@ internal class SwapCommands
 	{
 		var localuser = UserUtil.GetCurrentUser(ctx);
 		var targetuser = UserUtil.GetUserByCharacterName(username);
+
+		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "swap"))
+		{
+			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "swap");
+			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using .pe swap");
+			return;
+		}
 
 		if (SwapService.SwapExists(localuser) || SwapService.SwapExists(targetuser))
 		{
@@ -89,6 +93,9 @@ internal class SwapCommands
 
 			var msg = StringBuilders.SwapInfoMessage(swap);
 			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
+
+			CooldownTracker.SetCooldown(localuser.PlatformId, "swap");
+
 			ctx.Reply($"{Markup.Prefix}Swap request sent to {targetuser.CharacterName}.");
 		});
 	}
@@ -132,25 +139,58 @@ internal class SwapCommands
 	[Command("swap decline", description: "Decline incoming prisoner swap request")]
 	public static void DeclineSwap(ChatCommandContext ctx)
 	{
+		var localuser = UserUtil.GetCurrentUser(ctx);
+
+		var swap = SwapService.GetActiveSwap(localuser);
+		if (swap == null)
+		{
+			ctx.Reply($"{Markup.Prefix}No swap request found.");
+			return;
+		}
+
+		if (swap.Buyer.PlatformId != localuser.PlatformId)
+		{
+			ctx.Reply($"{Markup.Prefix}You have no incoming swap request to decline.");
+			return;
+		}
+
+		ctx.Reply($"{Markup.Prefix}Swap request from {swap.Seller.CharacterName} has been declined.");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
+				$"{Markup.Prefix}Your swap request was declined by {swap.Buyer.CharacterName}.");
+
+		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+
+		SwapService.RemoveSwap(swap.Seller);
+
+		Plugin.Logger.Info("SwapCommands",
+				$"Swap request from '{swap.Seller.CharacterName}' declined by '{swap.Buyer.CharacterName}'.");
 	}
 
 	[Command("swap cancel", description: "Cancel your outgoing prisoner swap request")]
 	public static void CancelSwap(ChatCommandContext ctx)
 	{
-	}
+		var localuser = UserUtil.GetCurrentUser(ctx);
 
-	[Command("swap list", description: "List all active prisoner swaps", adminOnly: true)]
-	public void ListSwaps(ChatCommandContext ctx)
-	{
-	}
+		var swap = SwapService.GetActiveSwap(localuser);
+		if (swap == null)
+		{
+			ctx.Reply($"{Markup.Prefix}No active swap request found to cancel.");
+			return;
+		}
 
-	[Command("swap remove", description: "Remove a specific user’s swap request", adminOnly: true)]
-	public void RemoveSwap(ChatCommandContext ctx)
-	{
-	}
+		if (swap.Seller.PlatformId != localuser.PlatformId)
+		{
+			ctx.Reply($"{Markup.Prefix}You do not have an outgoing swap request to cancel.");
+			return;
+		}
 
-	[Command("swap clear", description: "Clear all active prisoner swaps", adminOnly: true)]
-	public void ClearSwaps(ChatCommandContext ctx)
-	{
+		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+
+		SwapService.RemoveSwap(swap.Seller);
+
+		ctx.Reply($"{Markup.Prefix}Your swap request has been canceled.");
+		Plugin.Logger.Info("SwapCommands", $"User '{localuser.CharacterName}' canceled their outgoing prisoner swap request.");
 	}
 }

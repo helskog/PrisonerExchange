@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 using PrisonerExchange.Services;
+using PrisonerExchange.Utility;
 
 using VampireCommandFramework;
 
@@ -11,82 +10,57 @@ namespace PrisonerExchange.Commands;
 internal class AdminCommands
 {
 	/// <summary>
-	/// Test command for development.
+	/// Removes a specific user's active sale or swap request.
 	/// </summary>
-
-	[Command("pe test", description: "temporary", adminOnly: true)]
-	public void testCommand(ChatCommandContext ctx)
-	{
-	}
-
-	/// <summary>
-	/// Lists all active sale requests between users.
-	/// </summary>
-
-	[Command("pe list", description: "List all active prisoner exchanges.", adminOnly: true)]
-	public void ListExchanges(ChatCommandContext ctx)
-	{
-		var salesList = SalesService.GetAll()
-			.Select(sale =>
-			{
-				var info = sale.GetPrisonerInformation;
-
-				return new
-				{
-					SellerName = sale.Seller.CharacterName,
-					PrisonerType = info.UnitType,
-					BloodType = info.BloodType,
-					BloodQuality = info.BloodQuality,
-					BuyerName = sale.Buyer.CharacterName,
-					Price = sale.Price
-				};
-			})
-			.OrderByDescending(x => x.Price)
-			.ToList();
-
-		var sb = new StringBuilder();
-		sb.AppendLine("<size=15><color=yellow>Pending prisoner exchanges</color></size>");
-
-		foreach (var sale in salesList)
-		{
-			sb.AppendLine(
-				$"{Markup.Highlight(sale.SellerName)} is selling " +
-				$"{Markup.Highlight(sale.PrisonerType)} with " +
-				$"{Markup.Highlight(sale.BloodType)} " +
-				$"{Markup.Highlight($"{sale.BloodQuality}%")} " +
-				$"to {Markup.Highlight(sale.BuyerName)} " +
-				$"for <color={Markup.SecondaryColor}>{sale.Price}</color> {Configuration.CurrencyName}"
-			);
-		}
-
-		ctx.Reply(sb.ToString());
-	}
-
-	/// <summary>
-	/// Removes a specific exchange
-	/// </summary>
-	[Command("pe remove", description: "Clear a specific prisoner exchange.", adminOnly: true)]
+	[Command("pe remove", description: "Remove a specific user’s active prisoner sale or swap.", adminOnly: true)]
 	public void RemoveExchange(ChatCommandContext ctx, string from = "username")
 	{
-		var sale = SalesService.GetAll().FirstOrDefault(s => s.Seller.CharacterName.Equals(from, StringComparison.OrdinalIgnoreCase));
-
-		if (sale == null)
+		var user = UserUtil.GetUserByCharacterName(from);
+		if (user == null)
 		{
-			ctx.Reply($"{Markup.Prefix}No prisoner exchange found for {Markup.SecondaryColor}{from}.");
+			ctx.Reply($"{Markup.Prefix}No user found: {Markup.Highlight(from)}.");
 			return;
 		}
 
-		SalesService.RemoveSale(sale.Seller);
-		ctx.Reply($"{Markup.Prefix}Prisoner exchange from {from} has been removed.");
+		var sale = SalesService.GetAll().FirstOrDefault(s =>
+				s.Seller.PlatformId == user.PlatformId || s.Buyer.PlatformId == user.PlatformId);
+
+		if (sale != null)
+		{
+			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+
+			SalesService.RemoveSale(sale.Seller);
+			ctx.Reply($"{Markup.Prefix}Removed sale request involving {user.CharacterName}.");
+			return;
+		}
+
+		var swap = SwapService.GetAll().FirstOrDefault(s =>
+				s.Seller.PlatformId == user.PlatformId || s.Buyer.PlatformId == user.PlatformId);
+
+		if (swap != null)
+		{
+			// Remove the electric buff from both prisoners
+			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+
+			// Remove the swap
+			SwapService.RemoveSwap(swap.Seller);
+			ctx.Reply($"{Markup.Prefix}Removed swap request involving {user.CharacterName}.");
+			return;
+		}
+
+		ctx.Reply($"{Markup.Prefix}No active sale or swap found for user: {Markup.Highlight(from)}.");
 	}
 
 	/// <summary>
-	/// Clears all active sales between users.
+	/// Clears all active sales and swaps.
 	/// </summary>
-	[Command("pe clear", description: "Clear all active prisoner exchanges.", adminOnly: true)]
+	[Command("pe clear", description: "Clear all active prisoner exchanges (both sales and swaps).", adminOnly: true)]
 	public void ClearExchanges(ChatCommandContext ctx)
 	{
 		SalesService.ClearAll();
-		ctx.Reply($"{Markup.Prefix}Cleared all active exchanges!");
+		SwapService.ClearAll();
+
+		ctx.Reply($"{Markup.Prefix}Cleared all active prisoner sales and swaps!");
 	}
 }

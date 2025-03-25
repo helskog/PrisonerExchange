@@ -41,8 +41,8 @@ public class StringBuilders
 		var sb = new StringBuilder();
 		sb.AppendLine($"<size=15><color=yellow>Prisoner swap request</color></size>");
 		sb.AppendLine($"From user: {Markup.Highlight(swap.Seller.CharacterName)}");
-		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType}")}" + Markup.Secondary($"{swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}"));
-		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType}")}" + Markup.Secondary($"{swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}"));
+		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType}")} " + Markup.Secondary($"{swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}"));
+		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType}")} " + Markup.Secondary($"{swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}"));
 		sb.AppendLine();
 		sb.AppendLine($"Type {Markup.Highlight(".pe swap accept")} to complete the swap.");
 

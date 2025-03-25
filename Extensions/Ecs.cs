@@ -116,5 +116,19 @@ namespace PrisonerExchange.Extensions
 			entity.Add<T>();
 			entity.With(action);
 		}
+
+		public static bool SameTeam(this Entity entityA, Entity entityB)
+		{
+			if (!entityA.Exists() || !entityB.Exists())
+				return false;
+
+			if (!entityA.Has<Team>() || !entityB.Has<Team>())
+				return false;
+
+			var teamA = entityA.Read<Team>();
+			var teamB = entityB.Read<Team>();
+
+			return teamA.Value == teamB.Value;
+		}
 	}
 }
