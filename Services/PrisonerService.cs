@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using PrisonerExchange.Extensions;
 using System.Linq;
 using System;
+using static ProjectM.Tiles.TileConstants;
+using static ProjectM.NetherSpawnPositionMetadata;
+using static ProjectM.UI.UISpawningSystem;
 
 namespace PrisonerExchange.Commands;
 
@@ -68,16 +71,16 @@ public class PrisonerService
 	/// <summary>
 	/// Spawn new NPC and attach it to a prisoncell.
 	/// </summary>
-	public static void SpawnPrisonerInCell(PrisonerModel.PrisonerInformation prisonerInfo, Entity prisoncellEntity)
+	public static void SpawnPrisonerInCell(PrisonerModel.PrisonerInformation prisonerInfo, Entity prisoncellEntity, UserModel initiator)
 	{
 		if (!Core.EntityManager.TryGetComponentData<PrisonCell>(prisoncellEntity, out var prisonCellData))
 			Plugin.Logger.Error("PrisonerService", $"prisoncellEntity does not contain PrisonCell data.");
 
 		Prisonstation prisonStation = prisoncellEntity.Read<Prisonstation>();
 
-		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var localToWorld))
+		if (prisoncellEntity.TryGetComponent<LocalTransform>(out var transform))
 		{
-			var center = GetPrisonCellCenter(localToWorld.Position);
+			float3 center = transform.Position;
 
 			Entity spawnedEntity = Services.UnitSpawnerService.SpawnWithCallback(
 			Entity.Null,
@@ -113,7 +116,7 @@ public class PrisonerService
 				prisoncellEntity.Write(prisonStation);
 
 				// ImprisonedBuff
-				BuffUtil.BuffNPC(e, Entity.Null, BuffUtil.ELECTRIC_BUFF, -1);
+				BuffUtil.BuffNPC(e, initiator.Entity, BuffUtil.ELECTRIC_BUFF, -1);
 			},
 			center.y
 			);
@@ -123,7 +126,7 @@ public class PrisonerService
 	/// <summary>
 	/// Move one prisoner to an empty cell.
 	/// </summary>
-	public static void MovePrisoner(PrisonerModel prisoner, Entity prisoncell)
+	public static void MovePrisoner(PrisonerModel prisoner, Entity prisoncell, UserModel initiator)
 	{
 		Entity prisonerEntity = prisoner.PrisonerEntity;
 
@@ -135,13 +138,13 @@ public class PrisonerService
 		Plugin.Logger.Info("PrisonerService", $"Killing sender prisoner {prisonerEntity}.");
 
 		// Spawn new NPC for receiver
-		SpawnPrisonerInCell(prisonerInformation, prisoncell);
+		SpawnPrisonerInCell(prisonerInformation, prisoncell, initiator);
 	}
 
 	/// <summary>
 	/// Swap two prisoners between different prisoncells.
 	/// </summary>
-	public static bool SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB)
+	public static bool SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB, UserModel initiator)
 	{
 		Entity prisonCellA = GetAttachedPrisonCell(PrisonerA);
 		Entity prisonCellB = GetAttachedPrisonCell(PrisonerB);
@@ -161,8 +164,8 @@ public class PrisonerService
 		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 
 		// Spawn new prisoners in opposite cells
-		SpawnPrisonerInCell(prisonerInformationA, prisonCellB);
-		SpawnPrisonerInCell(prisonerInformationB, prisonCellA);
+		SpawnPrisonerInCell(prisonerInformationA, prisonCellB, initiator);
+		SpawnPrisonerInCell(prisonerInformationB, prisonCellA, initiator);
 
 		return true;
 	}
@@ -193,18 +196,31 @@ public class PrisonerService
 	}
 
 	/// <summary>
+	/// Calculate prison cell size based on tilebounds
+	/// </summary>
+	public static float2 GetEntitySizeInWorld(Entity entity)
+	{
+		if (!entity.Has<TileBounds>())
+		{
+			Plugin.Logger.Error("PrisonerService", $"Entity {entity.Index} is missing TileBounds.");
+			return new float2(2f, 2f); // fallback default
+		}
+
+		var bounds = entity.Read<TileBounds>().Value;
+		float width = bounds.Max.x - bounds.Min.x;
+		float depth = bounds.Max.y - bounds.Min.y;
+
+		return new float2(width, depth);
+	}
+
+	/// <summary>
 	/// Calculate center coordinates of a prison cell.
 	/// </summary>
-	public static float3 GetPrisonCellCenter(float3 cellPosition)
+	public static float3 GetPrisoncellCenter(float3 worldPosition, quaternion rotation, float width = 2.0f, float depth = 2.0f)
 	{
-		float cellWidth = 2.0f;
-		float cellDepth = 2.0f;
-
-		return new float3(
-						math.floor(cellPosition.x) + cellWidth / 2f,
-						cellPosition.y,
-						math.floor(cellPosition.z) + cellDepth / 2f
-		);
+		float3 localOffset = new float3(width / 2f, 0f, depth / 2f);
+		float3 rotatedOffset = math.rotate(rotation, localOffset);
+		return worldPosition + rotatedOffset;
 	}
 
 	public static bool IsSameTeam(Entity prisoncell, UserModel user)

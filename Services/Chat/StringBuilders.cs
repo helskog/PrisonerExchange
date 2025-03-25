@@ -8,7 +8,7 @@ using ProjectM;
 
 using VampireCommandFramework;
 
-namespace PrisonerExchange.Utility.Chat;
+namespace PrisonerExchange.Services.Chat;
 
 public class StringBuilders
 {
@@ -17,7 +17,7 @@ public class StringBuilders
 		var prisonerInfo = sale.GetPrisonerInformation;
 
 		var msg = $"{Markup.Prefix}{sale.Buyer.CharacterName} has purchased {prisonerInfo.UnitType} with {prisonerInfo.BloodQuality}%" +
-				$"{prisonerInfo.BloodType} from {sale.Seller.CharacterName}!";
+						$"{prisonerInfo.BloodType} from {sale.Seller.CharacterName}!";
 		ServerChatUtils.SendSystemMessageToAllClients(Core.EntityManager, msg);
 	}
 
@@ -26,13 +26,13 @@ public class StringBuilders
 		var prisonerInfo = sale.GetPrisonerInformation;
 
 		var sb = new StringBuilder();
-		sb.AppendLine($"<size=15><color=yellow>Prisoner exchange request</color></size>");
+		sb.AppendLine($"<size=15><color=yellow>Prisoner sale request</color></size>");
 		sb.AppendLine($"From: {Markup.Highlight(sale.Seller.CharacterName)}");
 		sb.AppendLine($"Price: {Markup.Highlight(sale.Price)} {Configuration.CurrencyName}");
 		sb.AppendLine($"Prisoner type: {prisonerInfo.UnitType}");
 		sb.AppendLine($"Prisoner blood: {Markup.Highlight($"{prisonerInfo.BloodQuality}% {prisonerInfo.BloodType}")}");
 		sb.AppendLine();
-		sb.AppendLine($"Type {Markup.Highlight(".pe accept")} while standing next to an empty prison cell.");
+		sb.AppendLine($"Type {Markup.Highlight(".pe sale accept")} while standing next to an empty prison cell.");
 
 		return sb.ToString();
 	}
@@ -40,12 +40,12 @@ public class StringBuilders
 	public static string SwapInfoMessage(PendingSwap swap)
 	{
 		var sb = new StringBuilder();
-		sb.AppendLine($"<size=15><color=yellow>Prisoner exchange request</color></size>");
+		sb.AppendLine($"<size=15><color=yellow>Prisoner swap request</color></size>");
 		sb.AppendLine($"From: {Markup.Highlight(swap.Seller.CharacterName)}");
-		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType} {swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}")}");
-		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType} {swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}")}");
+		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType} {swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}")}");
+		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType} {swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}")}");
 		sb.AppendLine();
-		sb.AppendLine($"Type {Markup.Highlight(".pe accept")}");
+		sb.AppendLine($"Type {Markup.Highlight(".pe swap accept")} to complete the swap.");
 
 		return sb.ToString();
 	}

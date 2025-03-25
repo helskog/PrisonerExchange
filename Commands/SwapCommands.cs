@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
+using PrisonerExchange.Services.Chat;
 using PrisonerExchange.Utility;
-using PrisonerExchange.Utility.Chat;
 
 using ProjectM;
 
@@ -87,21 +87,21 @@ internal class SwapCommands
 	[Command("swap accept", description: "Accept incoming prisoner swap request")]
 	public static void AcceptSwap(ChatCommandContext ctx)
 	{
-		var buyer = UserUtil.GetCurrentUser(ctx);
-		if (buyer == null)
+		var localuser = UserUtil.GetCurrentUser(ctx);
+		if (localuser == null)
 		{
 			ctx.Reply($"{Markup.Prefix}Could not determine your identity.");
 			return;
 		}
 
-		var swap = SwapService.GetActiveSwap(buyer);
+		var swap = SwapService.GetActiveSwap(localuser);
 		if (swap == null)
 		{
 			ctx.Reply($"{Markup.Prefix}No swap request to accept.");
 			return;
 		}
 
-		bool result = PrisonerService.SwapPrisoner(swap.PrisonerA, swap.PrisonerB);
+		bool result = PrisonerService.SwapPrisoner(swap.PrisonerA, swap.PrisonerB, localuser);
 
 		if (!result)
 		{
@@ -112,7 +112,7 @@ internal class SwapCommands
 		SwapService.RemoveSwap(swap.Seller);
 
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
-			$"{Markup.Prefix}{buyer.CharacterName} has accepted your prisoner swap.");
+			$"{Markup.Prefix}{localuser.CharacterName} has accepted your prisoner swap.");
 
 		ctx.Reply($"{Markup.Prefix}Swap complete.");
 	}

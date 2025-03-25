@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Timers;
 
-namespace PrisonerExchange.Utility.Chat;
+namespace PrisonerExchange.Services.Chat;
 
 public static class PromptManager
 {

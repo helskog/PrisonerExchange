@@ -3,8 +3,8 @@
 using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
+using PrisonerExchange.Services.Chat;
 using PrisonerExchange.Utility;
-using PrisonerExchange.Utility.Chat;
 
 using ProjectM;
 
@@ -198,7 +198,7 @@ internal class SaleCommands
 		}
 
 		// Handle prisoner transfer
-		PrisonerService.MovePrisoner(prisoner, prisonCellEntity);
+		PrisonerService.MovePrisoner(prisoner, prisonCellEntity, localuser);
 
 		if (!InventoryService.AddCurrencyToInventory(seller, price))
 		{

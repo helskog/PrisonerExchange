@@ -3,8 +3,7 @@
 using HarmonyLib;
 
 using PrisonerExchange.Extensions;
-using PrisonerExchange.Utility.Chat;
-
+using PrisonerExchange.Services.Chat;
 using ProjectM;
 using ProjectM.Network;
 
