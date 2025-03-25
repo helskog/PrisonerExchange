@@ -31,7 +31,7 @@ public static class SalesService
 
 	public static List<PendingSale> GetAll()
 	{
-		return [.. SalesList];
+		return SalesList;
 	}
 
 	public static PendingSale GetSaleBySeller(UserModel seller)

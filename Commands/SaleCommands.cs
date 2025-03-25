@@ -14,13 +14,14 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Commands;
 
-public class SaleCommands
+[CommandGroup("prisonerexchange", "pe")]
+internal class SaleCommands
 {
 	/// <summary>
 	/// Make an offer to sell prisoner to another user.
 	/// </summary>
 
-	[Command("pe sell", description: "Sell a prisoner for a price.")]
+	[Command("sell", description: "Sell a prisoner for a price.")]
 	public static void ExchangeCommand(ChatCommandContext ctx, string username, int price)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -32,9 +33,7 @@ public class SaleCommands
 			return;
 		}
 
-		bool targetHasPendingOffer = SalesService.GetAll().Any(s => s.Buyer == targetuser || s.Seller == targetuser);
-
-		if (targetHasPendingOffer)
+		if (SalesService.GetAll().Any(s => s.Buyer == targetuser || s.Seller == targetuser))
 		{
 			ctx.Reply($"{Markup.Prefix}Target user already has a pending offer. They must finish the exchange before getting a new offer!");
 			return;
@@ -46,17 +45,17 @@ public class SaleCommands
 			return;
 		}
 
-		if (localuser.Equals(targetuser))
-		{
-			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
-			return;
-		}
+		//if (localuser.Equals(targetuser))
+		//{
+		//	ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
+		//	return;
+		//}
 
-		if (localuser.Entity.SameTeam(targetuser.Entity))
-		{
-			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
-			return;
-		}
+		//if (localuser.Entity.SameTeam(targetuser.Entity))
+		//{
+		//	ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
+		//	return;
+		//}
 
 		Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 5);
 
@@ -88,7 +87,7 @@ public class SaleCommands
 			return;
 		}
 
-		if (!prisonCellEntity.HasPrisoner())
+		if (!PrisonerService.HasPrisoner(prisonCellEntity))
 		{
 			ctx.Reply($"{Markup.Prefix}The prison cell does not have a prisoner to sell!");
 			return;
@@ -123,7 +122,7 @@ public class SaleCommands
 	/// Cancel outgoing exchange request.
 	/// </summary>
 
-	[Command("pe sale cancel", description: "Cancel your outgoing exchange request.")]
+	[Command("sale cancel", description: "Cancel your outgoing exchange request.")]
 	public static void CancelCommand(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -149,7 +148,7 @@ public class SaleCommands
 	/// Accept incoming prisoner exchange request.
 	/// </summary>
 
-	[Command("pe sale accept", description: "Accept incoming prisoner exchange request.")]
+	[Command("sale accept", description: "Accept incoming prisoner exchange request.")]
 	public static void AcceptExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -162,7 +161,7 @@ public class SaleCommands
 		}
 
 		UserModel seller = sale.Seller;
-		Entity prisoner = sale.PrisonerEntity;
+		PrisonerModel prisoner = new PrisonerModel(sale.PrisonerEntity);
 		int price = sale.Price;
 
 		if (seller == null || !seller.User.IsConnected)
@@ -171,7 +170,7 @@ public class SaleCommands
 			return;
 		}
 
-		Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 5);
+		Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 3);
 
 		if (prisonCellEntity == Entity.Null)
 		{
@@ -179,7 +178,7 @@ public class SaleCommands
 			return;
 		}
 
-		if (prisonCellEntity.HasPrisoner())
+		if (PrisonerService.HasPrisoner(prisonCellEntity))
 		{
 			ctx.Reply($"{Markup.Prefix}The prison cell is not empty!");
 			return;
@@ -199,7 +198,7 @@ public class SaleCommands
 		}
 
 		// Handle prisoner transfer
-		PrisonerService.MovePrisoner(prisoner, localuser, prisonCellEntity);
+		PrisonerService.MovePrisoner(prisoner, prisonCellEntity);
 
 		if (!InventoryService.AddCurrencyToInventory(seller, price))
 		{
@@ -223,8 +222,7 @@ public class SaleCommands
 	/// <summary>
 	/// Decline incoming prisoner exchange.
 	/// </summary>
-
-	[Command("pe sale decline", description: "Decline incoming prisoner exchange request.")]
+	[Command("sale decline", description: "Decline incoming prisoner exchange request.")]
 	public static void DeclineExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);

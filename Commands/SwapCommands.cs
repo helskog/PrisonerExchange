@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
@@ -14,132 +15,129 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Commands;
 
-public class SwapCommands
+[CommandGroup("prisonerexchange", "pe")]
+internal class SwapCommands
 {
 	/// <summary>
 	/// Initiate a swap request to another user.
 	/// </summary>
-	[Command("pe swap", description: "Swap one prisoner for another.", adminOnly: true)]
+	[Command("swap", description: "Swap one prisoner for another.")]
 	public void RequestSwap(ChatCommandContext ctx, string username)
 	{
-		UserModel localuser = UserUtil.GetCurrentUser(ctx);
-		UserModel targetuser = UserUtil.GetUserByCharacterName(username);
+		var localuser = UserUtil.GetCurrentUser(ctx);
+		var targetuser = UserUtil.GetUserByCharacterName(username);
 
-		if (PromptManager.IsWaiting(localuser.PlatformId))
+		if (localuser == null || targetuser == null || !targetuser.User.IsConnected)
+		{
+			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
 			return;
+		}
 
-		//if (targetuser == null || !targetuser.User.IsConnected)
-		//{
-		//	ctx.Reply($"{Markup.Prefix}User is invalid or offline.");
-		//}
+		var prisonerList = PrisonerService.GetPrisonerList(targetuser);
+		if (prisonerList.Count == 0)
+		{
+			ctx.Reply($"{Markup.Prefix}Target user has no prisoners.");
+			return;
+		}
 
-		List<PrisonerModel> prisonerList = PrisonerService.GetPrisonerList(targetuser);
-
-		// Send formatted message to initiator including prisoners
 		StringBuilders.SendPrisonerList(ctx, prisonerList);
 
-		// Prompt to select prisoner index they want
-		PromptHelper.UserInput(ctx, id =>
+		PromptHelper.UserInput(ctx, input =>
 		{
-			if (!int.TryParse(id, out var selection))
+			if (!int.TryParse(input, out var selection) || selection < 1 || selection > prisonerList.Count)
 			{
-				ctx.Reply("Something went wrong with the selection, please try again.");
-				Plugin.Logger.Error("SwapService", "Could not convert string to int.");
+				ctx.Reply($"{Markup.Prefix}Invalid selection.");
 				return;
 			}
 
-			if (selection < 0 || selection > prisonerList.Count + 1)
-			{
-				ctx.Reply("Invalid selection.");
-				return;
-			}
+			var prisonerA = prisonerList[selection - 1];
 
-			PrisonerModel prisonerA = prisonerList[selection - 1]; // The selected prisoner
-
+			// Look for nearby prison cell to get PrisonerB
 			Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 3);
 
-			// Need to fix this, maybe link cell -> heart -> clan/user instead of teamid
-			if (!localuser.Entity.SameTeam(prisonCellEntity))
+			if (prisonCellEntity == Entity.Null || !Core.EntityManager.TryGetComponentData<PrisonCell>(prisonCellEntity, out var prisonCellData))
 			{
-				ctx.Reply($"{Markup.Prefix}You cannot swap another clans prisoner!");
+				ctx.Reply($"{Markup.Prefix}No valid prison cell found.");
 				return;
 			}
 
-			if (prisonCellEntity == Entity.Null)
+			if (!PrisonerService.HasPrisoner(prisonCellEntity))
 			{
-				ctx.Reply($"{Markup.Prefix}No suitable prison cell within range.");
+				ctx.Reply($"{Markup.Prefix}Your prison cell is empty.");
 				return;
 			}
 
-			if (!Core.EntityManager.TryGetComponentData<PrisonCell>(prisonCellEntity, out var prisonCellData))
-			{
-				Plugin.Logger.Error("SwapCommands", "Could not retrieve prison cell data.");
-				ctx.Reply("Could not retrieve prison cell data.");
-				return;
-			}
+			var prisonerB = new PrisonerModel(prisonCellData.ImprisonedEntity._Entity);
 
-			if (!prisonCellEntity.HasPrisoner())
-			{
-				ctx.Reply($"{Markup.Prefix}Your prison cell does not have a prisoner to swap!");
-				return;
-			}
+			var swap = new PendingSwap(localuser, targetuser, prisonerA, prisonerB, Configuration.ExpireExchangeAfter);
+			SwapService.AddSwap(swap);
 
-			// Prisoner from nearby cell
-			PrisonerModel prisonerB = new PrisonerModel(prisonCellData.ImprisonedEntity._Entity);
+			BuffUtil.BuffNPC(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
+			BuffUtil.BuffNPC(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
 
-			// Add new swap entry
-			PendingSwap newSwap = new(
-				seller: localuser,
-				buyer: targetuser,
-				prisonera: prisonerA,
-				prisonerb: prisonerB,
-				lifetimeSeconds: Configuration.ExpireExchangeAfter
-			);
-
-			SwapService.AddSwap(newSwap);
-
-			// Buff active request NPCs to visualize.
-			BuffUtil.BuffNPC(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
-			BuffUtil.BuffNPC(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
-
-			// Send message to target user asking to confirm swap
-			string msg = StringBuilders.SwapInfoMessage(newSwap);
+			var msg = StringBuilders.SwapInfoMessage(swap);
 			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
-
-			// Inform sender that the offer has been sent.
-			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, $"{Markup.Prefix}Request sent to user {targetuser.CharacterName}.");
-		}, null);
+			ctx.Reply($"{Markup.Prefix}Swap request sent to {targetuser.CharacterName}.");
+		});
 	}
 
 	/// <summary>
 	/// Accept swap request
 	/// </summary>
-	[Command("pe swap accept", description: "Accept incoming prisoner swap request")]
+	[Command("swap accept", description: "Accept incoming prisoner swap request")]
 	public static void AcceptSwap(ChatCommandContext ctx)
 	{
+		var buyer = UserUtil.GetCurrentUser(ctx);
+		if (buyer == null)
+		{
+			ctx.Reply($"{Markup.Prefix}Could not determine your identity.");
+			return;
+		}
+
+		var swap = SwapService.GetActiveSwap(buyer);
+		if (swap == null)
+		{
+			ctx.Reply($"{Markup.Prefix}No swap request to accept.");
+			return;
+		}
+
+		bool result = PrisonerService.SwapPrisoner(swap.PrisonerA, swap.PrisonerB);
+
+		if (!result)
+		{
+			ctx.Reply($"{Markup.Prefix}Something went wrong during the swap.");
+			return;
+		}
+
+		SwapService.RemoveSwap(swap.Seller);
+
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
+			$"{Markup.Prefix}{buyer.CharacterName} has accepted your prisoner swap.");
+
+		ctx.Reply($"{Markup.Prefix}Swap complete.");
 	}
 
-	[Command("pe swap decline", description: "Decline incoming prisoner swap request")]
+	[Command("swap decline", description: "Decline incoming prisoner swap request")]
 	public static void DeclineSwap(ChatCommandContext ctx)
 	{
 	}
 
-	[Command("pe swap cancel", description: "Cancel your outgoing prisoner swap request")]
+	[Command("swap cancel", description: "Cancel your outgoing prisoner swap request")]
 	public static void CancelSwap(ChatCommandContext ctx)
 	{
 	}
 
-	[Command("pe swap list", description: "List all active prisoner swaps", adminOnly: true)]
+	[Command("swap list", description: "List all active prisoner swaps", adminOnly: true)]
 	public void ListSwaps(ChatCommandContext ctx)
 	{
 	}
 
-	[Command("pe swap remove", description: "Remove a specific user’s swap request", adminOnly: true)]
+	[Command("swap remove", description: "Remove a specific user’s swap request", adminOnly: true)]
 	public void RemoveSwap(ChatCommandContext ctx)
 	{
 	}
 
-	[Command("pe swap clear", description: "Clear all active prisoner swaps", adminOnly: true)]
+	[Command("swap clear", description: "Clear all active prisoner swaps", adminOnly: true)]
 	public void ClearSwaps(ChatCommandContext ctx)
 	{
 	}

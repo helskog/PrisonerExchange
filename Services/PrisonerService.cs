@@ -2,16 +2,13 @@
 using PrisonerExchange.Utility;
 using ProjectM.Behaviours;
 using ProjectM;
-using Stunlock.Core;
-using System.Linq;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using System.Collections.Generic;
-using System;
 using PrisonerExchange.Extensions;
-using static PrisonerExchange.Models.PrisonerModel;
-using Unity.Collections;
+using System.Linq;
+using System;
 
 namespace PrisonerExchange.Commands;
 
@@ -71,9 +68,11 @@ public class PrisonerService
 	/// <summary>
 	/// Spawn new NPC and attach it to a prisoncell.
 	/// </summary>
-	public static void SpawnPrisonerInCell(PrisonerInformation prisonerInfo, Entity prisoncellEntity)
+	public static void SpawnPrisonerInCell(PrisonerModel.PrisonerInformation prisonerInfo, Entity prisoncellEntity)
 	{
-		PrisonCell prisonCell = prisoncellEntity.Read<PrisonCell>();
+		if (!Core.EntityManager.TryGetComponentData<PrisonCell>(prisoncellEntity, out var prisonCellData))
+			Plugin.Logger.Error("PrisonerService", $"prisoncellEntity does not contain PrisonCell data.");
+
 		Prisonstation prisonStation = prisoncellEntity.Read<Prisonstation>();
 
 		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var localToWorld))
@@ -108,8 +107,8 @@ public class PrisonerService
 				e.Write(imprisoned);
 				e.Write(behaviourTreeState);
 
-				prisonCell.ImprisonedEntity = e;
-				prisoncellEntity.Write(prisonCell);
+				prisonCellData.ImprisonedEntity = e;
+				prisoncellEntity.Write(prisonCellData);
 				prisonStation.HasPrisoner = true;
 				prisoncellEntity.Write(prisonStation);
 
@@ -129,14 +128,14 @@ public class PrisonerService
 		Entity prisonerEntity = prisoner.PrisonerEntity;
 
 		// Gather information about prisoner.
-		PrisonerInformation prisonerInformation = prisoner.Info;
+		PrisonerModel.PrisonerInformation prisonerInformation = prisoner.Info;
 
 		// Kill senderentity
 		StatChangeUtility.KillEntity(Core.EntityManager, prisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 		Plugin.Logger.Info("PrisonerService", $"Killing sender prisoner {prisonerEntity}.");
 
 		// Spawn new NPC for receiver
-		SpawnPrisonerInCell(prisonerInformation, prisonerEntity);
+		SpawnPrisonerInCell(prisonerInformation, prisoncell);
 	}
 
 	/// <summary>
@@ -154,14 +153,17 @@ public class PrisonerService
 		}
 
 		// Get prisoner information for spawning new ones.
-		PrisonerInformation prisonerInformationA = PrisonerA.Info;
-		PrisonerInformation prisonerInformationB = PrisonerB.Info;
+		PrisonerModel.PrisonerInformation prisonerInformationA = PrisonerA.Info;
+		PrisonerModel.PrisonerInformation prisonerInformationB = PrisonerB.Info;
 
 		// Kill both prisoners
 		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerA.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 
 		// Spawn new prisoners in opposite cells
+		SpawnPrisonerInCell(prisonerInformationA, prisonCellB);
+		SpawnPrisonerInCell(prisonerInformationB, prisonCellA);
+
 		return true;
 	}
 
@@ -177,6 +179,20 @@ public class PrisonerService
 	}
 
 	/// <summary>
+	/// Check if cell already has prisoner.
+	/// </summary>
+	public static bool HasPrisoner(Entity cellEntity)
+	{
+		if (!Core.EntityManager.TryGetComponentData<PrisonCell>(cellEntity, out var celldata))
+			return false;
+
+		if (celldata.ImprisonedEntity._Entity == Entity.Null)
+			return false;
+
+		return true;
+	}
+
+	/// <summary>
 	/// Calculate center coordinates of a prison cell.
 	/// </summary>
 	public static float3 GetPrisonCellCenter(float3 cellPosition)
@@ -189,5 +205,16 @@ public class PrisonerService
 						cellPosition.y,
 						math.floor(cellPosition.z) + cellDepth / 2f
 		);
+	}
+
+	public static bool IsSameTeam(Entity prisoncell, UserModel user)
+	{
+		var castleTeamId = prisoncell.Read<Team>().Value;
+		var userTeamId = user.User.LocalCharacter._Entity.Read<Team>().Value;
+
+		if (castleTeamId == userTeamId)
+			return true;
+
+		return false;
 	}
 }

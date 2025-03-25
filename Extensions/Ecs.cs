@@ -25,17 +25,6 @@ namespace PrisonerExchange.Extensions
 			return EM.HasComponent<T>(entity);
 		}
 
-		public static bool HasPrisoner(this Entity cellEntity)
-		{
-			if (!EM.TryGetComponentData<PrisonCell>(cellEntity, out var celldata))
-				return false;
-
-			if (celldata.ImprisonedEntity._Entity == Entity.Null)
-				return false;
-
-			return true;
-		}
-
 		public static bool SameTeam(this Entity entityA, Entity entityB)
 		{
 			if (!entityA.Exists() || !entityB.Exists())

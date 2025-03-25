@@ -13,7 +13,7 @@ namespace PrisonerExchange.Services;
 
 public static class SwapService
 {
-	private static readonly List<PendingSwap> SwapsList = new();
+	private static readonly List<PendingSwap> SwapsList = new List<PendingSwap>();
 	private static readonly Timer CleanupTimer;
 
 	static SwapService()
@@ -32,17 +32,12 @@ public static class SwapService
 
 	public static List<PendingSwap> GetAll()
 	{
-		return [.. SwapsList];
+		return SwapsList;
 	}
 
-	public static PendingSwap GetSwapBySeller(UserModel user)
+	public static PendingSwap GetActiveSwap(UserModel user)
 	{
-		return SwapsList.FirstOrDefault(s => s.Seller.PlatformId == user.PlatformId);
-	}
-
-	public static PendingSwap GetSwapByTarget(UserModel user)
-	{
-		return SwapsList.FirstOrDefault(s => s.Buyer.PlatformId == user.PlatformId);
+		return SwapsList.FirstOrDefault(s => s.Seller.PlatformId == user.PlatformId || s.Buyer.PlatformId == user.PlatformId);
 	}
 
 	public static bool SwapExists(UserModel user)
@@ -58,7 +53,7 @@ public static class SwapService
 	{
 		lock (SwapsList)
 		{
-			var existing = GetSwapBySeller(seller);
+			var existing = GetActiveSwap(seller);
 			if (existing != null)
 			{
 				SwapsList.Remove(existing);
@@ -88,7 +83,6 @@ public static class SwapService
 			{
 				SwapsList.Remove(ex);
 
-				// Inform both sides that it expired
 				if (ex.Seller.User.IsConnected)
 				{
 					var msg = $"{Markup.Prefix}Your prisoner swap request with {ex.Buyer.CharacterName} has expired.";
