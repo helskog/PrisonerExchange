@@ -10,41 +10,45 @@ namespace PrisonerExchange.Models;
 public class PrisonerModel
 {
 	private readonly EntityManager EM = Core.EntityManager;
-	private readonly Entity prisonerEntity;
+	private readonly Entity entity;
 
 	public PrisonerModel(Entity prisoner)
 	{
-		prisonerEntity = prisoner;
+		entity = prisoner;
 	}
 
-	public Entity PrisonerEntity => prisonerEntity;
+	public Entity PrisonerEntity => entity;
 
 	public PrisonerInformation Info
 	{
 		get
 		{
-			if (!prisonerEntity.Exists())
+			if (!entity.Exists())
 				return null;
 
+			PrefabGUID prefabGUID = PrefabGUID.Empty;
+			BloodConsumeSource bloodInfo = new BloodConsumeSource();
 			string unitType = "Unknown";
 			string bloodType = "Unknown";
 			string bloodQuality = "Unknown";
 
-			if (prisonerEntity.Has<PrefabGUID>())
+			if (entity.Has<PrefabGUID>())
 			{
-				var prefab = prisonerEntity.Read<PrefabGUID>();
-				unitType = Prefabs.UnitTypes.TryGetValue(prefab, out var knownUnitType) ? knownUnitType : "Unknown";
+				prefabGUID = entity.Read<PrefabGUID>();
+				unitType = Prefabs.UnitTypes.TryGetValue(prefabGUID, out var knownUnitType) ? knownUnitType : "Unknown";
 			}
 
-			if (prisonerEntity.Has<BloodConsumeSource>())
+			if (entity.Has<BloodConsumeSource>())
 			{
-				var blood = prisonerEntity.Read<BloodConsumeSource>();
-				bloodType = Prefabs.BloodTypes.TryGetValue(blood.UnitBloodType, out var knownBloodType) ? knownBloodType : "Unknown";
-				bloodQuality = blood.BloodQuality.ToString("F0");
+				bloodInfo = entity.Read<BloodConsumeSource>();
+				bloodType = Prefabs.BloodTypes.TryGetValue(bloodInfo.UnitBloodType, out var knownBloodType) ? knownBloodType : "Unknown";
+				bloodQuality = bloodInfo.BloodQuality.ToString("F0");
 			}
 
 			return new PrisonerInformation
 			{
+				PrefabGUID = prefabGUID,
+				BloodInfo = bloodInfo,
 				UnitType = unitType,
 				BloodType = bloodType,
 				BloodQuality = bloodQuality
@@ -54,6 +58,8 @@ public class PrisonerModel
 
 	public class PrisonerInformation
 	{
+		public PrefabGUID PrefabGUID { get; init; }
+		public BloodConsumeSource BloodInfo { get; init; }
 		public string UnitType { get; init; }
 		public string BloodType { get; init; }
 		public string BloodQuality { get; init; }

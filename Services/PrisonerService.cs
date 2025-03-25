@@ -10,13 +10,15 @@ using Unity.Transforms;
 using System.Collections.Generic;
 using System;
 using PrisonerExchange.Extensions;
+using static PrisonerExchange.Models.PrisonerModel;
+using Unity.Collections;
 
 namespace PrisonerExchange.Commands;
 
 public class PrisonerService
 {
 	/// <summary>
-	/// identify prisoners by clan name or username
+	/// Gather a list of prisoners owned by a clan / user.
 	/// </summary>
 	public static List<PrisonerModel> GetPrisonerList(UserModel user)
 	{
@@ -66,18 +68,21 @@ public class PrisonerService
 		return prisonerList;
 	}
 
-	public static void SpawnPrisoner(Entity sender, UserModel receiver, PrefabGUID unit, PrefabGUID bloodtype, int bloodquality, Entity prisonCellEntity)
+	/// <summary>
+	/// Spawn new NPC and attach it to a prisoncell.
+	/// </summary>
+	public static void SpawnPrisonerInCell(PrisonerInformation prisonerInfo, Entity prisoncellEntity)
 	{
-		PrisonCell prisonCell = prisonCellEntity.Read<PrisonCell>();
-		Prisonstation prisonstation = prisonCellEntity.Read<Prisonstation>();
+		PrisonCell prisonCell = prisoncellEntity.Read<PrisonCell>();
+		Prisonstation prisonStation = prisoncellEntity.Read<Prisonstation>();
 
-		if (prisonCellEntity.TryGetComponent<LocalToWorld>(out var localToWorld))
+		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var localToWorld))
 		{
 			var center = GetPrisonCellCenter(localToWorld.Position);
 
 			Entity spawnedEntity = Services.UnitSpawnerService.SpawnWithCallback(
-			sender,
-			unit,
+			Entity.Null,
+			prisonerInfo.PrefabGUID,
 			new float2(center.x, center.z),
 			-1,
 			(e) =>
@@ -85,14 +90,15 @@ public class PrisonerService
 				if (e.Has<BloodConsumeSource>())
 				{
 					var blood = Core.EntityManager.GetComponentData<BloodConsumeSource>(e);
-					blood.UnitBloodType._Value = bloodtype;
-					blood.BloodQuality = bloodquality;
+					blood.UnitBloodType._Value = prisonerInfo.BloodInfo.UnitBloodType;
+					blood.BloodQuality = prisonerInfo.BloodInfo.BloodQuality;
 					blood.CanBeConsumed = true;
 					Core.EntityManager.SetComponentData(e, blood);
 				}
 
 				Imprisoned imprisoned = new Imprisoned();
-				imprisoned.PrisonCellEntity = prisonCellEntity;
+				imprisoned.PrisonCellEntity = prisoncellEntity;
+
 				BehaviourTreeState behaviourTreeState = e.Read<BehaviourTreeState>();
 				behaviourTreeState.Value = GenericEnemyState.Imprisoned;
 				BehaviourTreeStateMetadata behaviourTreeStateMetadata = e.Read<BehaviourTreeStateMetadata>();
@@ -103,37 +109,65 @@ public class PrisonerService
 				e.Write(behaviourTreeState);
 
 				prisonCell.ImprisonedEntity = e;
-				prisonCellEntity.Write(prisonCell);
-				prisonstation.HasPrisoner = true;
-				prisonCellEntity.Write(prisonstation);
+				prisoncellEntity.Write(prisonCell);
+				prisonStation.HasPrisoner = true;
+				prisoncellEntity.Write(prisonStation);
 
 				// ImprisonedBuff
-				BuffUtil.BuffNPC(e, receiver.Entity, BuffUtil.ELECTRIC_BUFF, -1);
+				BuffUtil.BuffNPC(e, Entity.Null, BuffUtil.ELECTRIC_BUFF, -1);
 			},
 			center.y
 			);
 		}
 	}
 
-	public static void MovePrisoner(Entity unitEntity, UserModel receiverUser, Entity receiverCell)
+	/// <summary>
+	/// Move one prisoner to an empty cell.
+	/// </summary>
+	public static void MovePrisoner(PrisonerModel prisoner, Entity prisoncell)
 	{
-		// Gather unitEntity values
-		PrefabGUID prefab = unitEntity.Read<PrefabGUID>();
-		BloodConsumeSource blood = unitEntity.Read<BloodConsumeSource>();
+		Entity prisonerEntity = prisoner.PrisonerEntity;
+
+		// Gather information about prisoner.
+		PrisonerInformation prisonerInformation = prisoner.Info;
 
 		// Kill senderentity
-		StatChangeUtility.KillEntity(Core.EntityManager, unitEntity, Entity.Null, 0.0, StatChangeReason.Default);
-		Plugin.Logger.Info("PrisonerService", $"Killing sender prisoner {unitEntity}.");
+		StatChangeUtility.KillEntity(Core.EntityManager, prisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
+		Plugin.Logger.Info("PrisonerService", $"Killing sender prisoner {prisonerEntity}.");
 
 		// Spawn new NPC for receiver
-		SpawnPrisoner(receiverUser.Entity, receiverUser, prefab, blood.UnitBloodType, (int)blood.BloodQuality, receiverCell);
-		Plugin.Logger.Info("PrisonerService", $"Spawning new npc for {receiverUser.CharacterName}.");
+		SpawnPrisonerInCell(prisonerInformation, prisonerEntity);
 	}
 
-	public static void SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB)
+	/// <summary>
+	/// Swap two prisoners between different prisoncells.
+	/// </summary>
+	public static bool SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB)
 	{
+		Entity prisonCellA = GetAttachedPrisonCell(PrisonerA);
+		Entity prisonCellB = GetAttachedPrisonCell(PrisonerB);
+
+		if (prisonCellA == Entity.Null || prisonCellB == Entity.Null)
+		{
+			Plugin.Logger.Error("PrisonerService", $"Could not get either PrisoncellA or PrisoncellB during prisoner swap.");
+			return false;
+		}
+
+		// Get prisoner information for spawning new ones.
+		PrisonerInformation prisonerInformationA = PrisonerA.Info;
+		PrisonerInformation prisonerInformationB = PrisonerB.Info;
+
+		// Kill both prisoners
+		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerA.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
+		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
+
+		// Spawn new prisoners in opposite cells
+		return true;
 	}
 
+	/// <summary>
+	/// Get attached prison cell entity of a prisoner
+	/// </summary>
 	public static Entity GetAttachedPrisonCell(PrisonerModel prisoner)
 	{
 		if (!prisoner.PrisonerEntity.Has<Imprisoned>())
@@ -142,6 +176,9 @@ public class PrisonerService
 		return prisoner.PrisonerEntity.Read<Imprisoned>().PrisonCellEntity;
 	}
 
+	/// <summary>
+	/// Calculate center coordinates of a prison cell.
+	/// </summary>
 	public static float3 GetPrisonCellCenter(float3 cellPosition)
 	{
 		float cellWidth = 2.0f;
