@@ -1,13 +1,8 @@
 ﻿using System;
 
-using ProjectM.Network;
-
-using Unity.Collections;
-using Unity.Entities;
-
 using VampireCommandFramework;
 
-namespace PrisonerExchange.Services.Chat;
+namespace PrisonerExchange.Utility.Chat;
 
 public static class PromptHelper
 {
@@ -21,15 +16,15 @@ public static class PromptHelper
 		}
 
 		PromptManager.RequestInput(userId,
-				response =>
-				{
-					onInput(response);
-				},
-				() =>
-				{
-					ctx.Reply("Selection has timed out.");
-				},
-				timeout
+			response =>
+			{
+				onInput(response);
+			},
+			() =>
+			{
+				ctx.Reply("Selection has timed out.");
+			},
+			timeout
 		);
 	}
 }

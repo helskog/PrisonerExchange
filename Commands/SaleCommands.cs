@@ -4,6 +4,7 @@ using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
 using PrisonerExchange.Utility;
+using PrisonerExchange.Utility.Chat;
 
 using ProjectM;
 
@@ -13,7 +14,7 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Commands;
 
-public class UserCommands
+public class SaleCommands
 {
 	/// <summary>
 	/// Make an offer to sell prisoner to another user.
@@ -111,7 +112,7 @@ public class UserCommands
 		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
 
 		// Send message to receiving user.
-		string msg = Services.Chat.StringBuilders.SalesInfoMessage(newSale);
+		string msg = StringBuilders.SalesInfoMessage(newSale);
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
 
 		// Inform sender that the offer has been sent.
@@ -122,7 +123,7 @@ public class UserCommands
 	/// Cancel outgoing exchange request.
 	/// </summary>
 
-	[Command("pe cancel", description: "Cancel your outgoing exchange request.")]
+	[Command("pe sale cancel", description: "Cancel your outgoing exchange request.")]
 	public static void CancelCommand(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -148,7 +149,7 @@ public class UserCommands
 	/// Accept incoming prisoner exchange request.
 	/// </summary>
 
-	[Command("pe accept", description: "Accept incoming prisoner exchange request.")]
+	[Command("pe sale accept", description: "Accept incoming prisoner exchange request.")]
 	public static void AcceptExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -213,7 +214,7 @@ public class UserCommands
 
 		if (Configuration.AnnounceExchange)
 		{
-			Services.Chat.StringBuilders.AnnounceSale(sale);
+			StringBuilders.AnnounceSale(sale);
 		}
 
 		ctx.Reply($"{Markup.Prefix}Completed exchange for prisoner!");
@@ -223,7 +224,7 @@ public class UserCommands
 	/// Decline incoming prisoner exchange.
 	/// </summary>
 
-	[Command("pe decline", description: "Decline incoming prisoner exchange request.")]
+	[Command("pe sale decline", description: "Decline incoming prisoner exchange request.")]
 	public static void DeclineExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);

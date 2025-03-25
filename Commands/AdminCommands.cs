@@ -20,8 +20,9 @@ internal class AdminCommands
 	}
 
 	/// <summary>
-	/// Lists all active exchange requests between users.
+	/// Lists all active sale requests between users.
 	/// </summary>
+
 	[Command("pe list", description: "List all active prisoner exchanges.", adminOnly: true)]
 	public void ListExchanges(ChatCommandContext ctx)
 	{
@@ -62,7 +63,7 @@ internal class AdminCommands
 	}
 
 	/// <summary>
-	/// Removes a specific exchange belonging to the user named `from`.
+	/// Removes a specific exchange
 	/// </summary>
 	[Command("pe remove", description: "Clear a specific prisoner exchange.", adminOnly: true)]
 	public void RemoveExchange(ChatCommandContext ctx, string from = "username")
@@ -80,7 +81,7 @@ internal class AdminCommands
 	}
 
 	/// <summary>
-	/// Clears all active exchanges between users.
+	/// Clears all active sales between users.
 	/// </summary>
 	[Command("pe clear", description: "Clear all active prisoner exchanges.", adminOnly: true)]
 	public void ClearExchanges(ChatCommandContext ctx)

@@ -81,7 +81,7 @@ public static class SwapService
 		lock (SwapsList)
 		{
 			var expired = SwapsList
-					.Where(s => (DateTime.UtcNow - s.CreatedAt).TotalSeconds >= s.LifeTimeSeconds)
+					.Where(s => (DateTime.UtcNow - s.CreatedAt).TotalSeconds >= s.LifetimeSeconds)
 					.ToList();
 
 			foreach (var ex in expired)

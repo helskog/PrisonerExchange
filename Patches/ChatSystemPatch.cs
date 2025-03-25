@@ -3,6 +3,7 @@
 using HarmonyLib;
 
 using PrisonerExchange.Extensions;
+using PrisonerExchange.Utility.Chat;
 
 using ProjectM;
 using ProjectM.Network;
@@ -10,7 +11,7 @@ using ProjectM.Network;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace PrisonerExchange.Services.Chat;
+namespace PrisonerExchange.Patches;
 
 [HarmonyPatch(typeof(ChatMessageSystem), nameof(ChatMessageSystem.OnUpdate))]
 [HarmonyPriority(400)]

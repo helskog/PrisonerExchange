@@ -29,7 +29,7 @@ public class Plugin : BasePlugin
 		Logger = Log;
 		Instance = this;
 
-		Log.Info("EntryPoint", $"Plugin {MyPluginInfo.PLUGIN_GUID} version {MyPluginInfo.PLUGIN_VERSION} is loaded!");
+		Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} version {MyPluginInfo.PLUGIN_VERSION} is loaded!");
 
 		_harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
 		_harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());

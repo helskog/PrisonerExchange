@@ -130,6 +130,18 @@ public class PrisonerService
 		Plugin.Logger.Info("PrisonerService", $"Spawning new npc for {receiverUser.CharacterName}.");
 	}
 
+	public static void SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB)
+	{
+	}
+
+	public static Entity GetAttachedPrisonCell(PrisonerModel prisoner)
+	{
+		if (!prisoner.PrisonerEntity.Has<Imprisoned>())
+			return Entity.Null;
+
+		return prisoner.PrisonerEntity.Read<Imprisoned>().PrisonCellEntity;
+	}
+
 	public static float3 GetPrisonCellCenter(float3 cellPosition)
 	{
 		float cellWidth = 2.0f;

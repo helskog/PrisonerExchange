@@ -3,8 +3,8 @@
 using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
-using PrisonerExchange.Services.Chat;
 using PrisonerExchange.Utility;
+using PrisonerExchange.Utility.Chat;
 
 using ProjectM;
 
@@ -36,7 +36,7 @@ public class SwapCommands
 		List<PrisonerModel> prisonerList = PrisonerService.GetPrisonerList(targetuser);
 
 		// Send formatted message to initiator including prisoners
-		Services.Chat.StringBuilders.SendPrisonerList(ctx, prisonerList);
+		StringBuilders.SendPrisonerList(ctx, prisonerList);
 
 		// Prompt to select prisoner index they want
 		PromptHelper.UserInput(ctx, id =>
@@ -58,7 +58,7 @@ public class SwapCommands
 
 			Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 3);
 
-			// Sanity checks
+			// Need to fix this, maybe link cell -> heart -> clan/user instead of teamid
 			if (!localuser.Entity.SameTeam(prisonCellEntity))
 			{
 				ctx.Reply($"{Markup.Prefix}You cannot swap another clans prisoner!");
@@ -98,19 +98,16 @@ public class SwapCommands
 
 			SwapService.AddSwap(newSwap);
 
-			Plugin.Logger.Info("UserCommands", $"User '{localuser.CharacterName}' initiated prisoner sale to '{targetuser.CharacterName}' for {price} {Configuration.CurrencyName}.");
+			// Buff active request NPCs to visualize.
+			BuffUtil.BuffNPC(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
+			BuffUtil.BuffNPC(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
 
-			// Buff active request NPC to visualize.
-			//BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
-
-			// Send message to receiving user.
-			//string msg = Services.Chat.StringBuilders.SalesInfoMessage(newSale);
-			//ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
+			// Send message to target user asking to confirm swap
+			string msg = StringBuilders.SwapInfoMessage(newSwap);
+			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
 
 			// Inform sender that the offer has been sent.
-			//ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, $"{Markup.Prefix}Request sent to user {targetuser.CharacterName}");
-
-			//ctx.Reply($"User selected: {selectedPrisoner.Info.UnitType} with {selectedPrisoner.Info.BloodQuality}% {selectedPrisoner.Info.BloodType}!");
+			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, $"{Markup.Prefix}Request sent to user {targetuser.CharacterName}.");
 		}, null);
 	}
 
