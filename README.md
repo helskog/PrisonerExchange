@@ -4,11 +4,28 @@
 <details>
 <summary><strong>Staff Commands</strong></summary>
 
-- `.pe list sales` List all active prisoner sale requests between users.
-- `.pe list swaps` List all active prisoner swap requests between users.
-- `.pe clear sales` Clear all active prisoner sale requests between users.
-- `.pe clear swaps` Clear all active prisoner swap requests between users.
-- `.pe remove (username)` Remove any sale/swap request from a specified user. 
+- `.pe clear` Clear all active prisoner exchanges between users.
+- `.pe remove (username)` Remove any sale/swap request involving a specified user. 
+
+</details>
+
+<details>
+<summary><strong>Sale commands</strong></summary>
+
+- `.pe sell (username) (price)` Sends a sale offer to the specified username.
+- `.pe sale cancel` Cancel outgoing sale offer.
+- `.pe sale accept` Accept incoming sale offer.
+- `.pe sale decline` Decline incoming sale offer.
+
+</details>
+
+<details>
+<summary><strong>Swap commands</strong></summary>
+
+- `.pe swap (username)` Initiate a trade with another user (prisoner for prisoner).
+- `.pe swap cancel` Cancel outgoing swap offer.
+- `.pe swap accept` Accept incoming swap offer.
+- `.pe swap decline` Decline incoming swap offer.
 
 </details>
 
