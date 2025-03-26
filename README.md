@@ -1,13 +1,16 @@
 # PrisonerExchange
+A V Rising plugin made to enable trading and swapping prisoners between clans, without the hassle of manually transferring them.
 
-## Features
-- Light/dark mode toggle
-- Live previews
-- Fullscreen mode
-- Cross platform
+### Features
+- Sell a prisoner to another user or clan.
+- Swap a prisoner for another with a user or clan.
+- Set a custom PrefabGUID as currency for handling sales.
+- Announce completed prisoner sales in global chat
+- Set a minimum/maximum sale price as a global limit.
+- Customizable command cooldown for selling/swapping prisoners.
+- Automatic expiration of sale and swap offers.
 
-
-## Commands
+### Commands
 <details>
 <summary><strong>Staff Commands</strong></summary>
 
@@ -37,7 +40,7 @@
 
 </details>
 
-## Configuration
+### Configuration
 The config file is automatically generated under the server install directory as `\BepInEx\config\PrisonerExchange.cfg`
 <details>
 <summary><strong>Sample configuration</strong></summary>
@@ -101,7 +104,7 @@ ExpireExchangeAfter = 60
 
 </details>
 
-## Credits
+### Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Cmmunity. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
 > **[Deca](https://github.com/decaprime)** for their work on **Bloodstone** and **VampireCommandFramework**
@@ -113,5 +116,5 @@ Some crucial parts of the plugin is either derived or copied from existing open-
 > **[inility](https://github.com/Darreans)** for helping out with testing a version of the plugin on his server **Sanguine Reign**.
 
 
-## License
+#### License
 [This project is licensed under the AGPL-3.0 license.](https://choosealicense.com/licenses/agpl-3.0/#)
