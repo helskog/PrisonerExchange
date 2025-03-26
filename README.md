@@ -100,6 +100,7 @@ ExpireExchangeAfter = 60
 ```
 
 </details>
+
 ## Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Cmmunity. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
@@ -110,3 +111,7 @@ Some crucial parts of the plugin is either derived or copied from existing open-
 > **[Trodi](https://github.com/oscarpedrero)** for their work on the **Bloodycore** framework.
 
 > **[inility](https://github.com/Darreans)** for helping out with testing a version of the plugin on his server **Sanguine Reign**.
+
+
+## License
+[This project is licensed under the AGPL-3.0 license.](https://choosealicense.com/licenses/agpl-3.0/#)
