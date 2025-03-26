@@ -1,7 +1,7 @@
 # PrisonerExchange
 A V Rising plugin made to enable trading and swapping prisoners between clans, without the hassle of manually transferring them.
 
-### Features
+## Features
 - Sell a prisoner to another user or clan.
 - Swap a prisoner for another with a user or clan.
 - Set a custom PrefabGUID as currency for handling sales.
@@ -10,7 +10,7 @@ A V Rising plugin made to enable trading and swapping prisoners between clans, w
 - Customizable command cooldown for selling/swapping prisoners.
 - Automatic expiration of sale and swap offers.
 
-### Commands
+## Commands
 <details>
 <summary><strong>Staff Commands</strong></summary>
 
@@ -40,7 +40,7 @@ A V Rising plugin made to enable trading and swapping prisoners between clans, w
 
 </details>
 
-### Configuration
+## Configuration
 The config file is automatically generated under the server install directory as `\BepInEx\config\PrisonerExchange.cfg`
 <details>
 <summary><strong>Sample configuration</strong></summary>
@@ -104,8 +104,15 @@ ExpireExchangeAfter = 60
 
 </details>
 
+## Disclaimer
+This plugin has only been tested in a limited enviroment so far, so beware bugs or other issues that could arise, to report them you can raise an issue here on github or join the [V Rising modding community discord](https://discord.com/invite/QG2FmueAG9) to speak with me directly.
+
+### Dependencies
+- [VampireCommandFramework](https://thunderstore.io/c/v-rising/p/deca/VampireCommandFramework/)
+- [Bloodstone](https://thunderstore.io/c/v-rising/p/deca/Bloodstone/)
+
 ### Credits
-Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Cmmunity. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
+Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Community. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
 > **[Deca](https://github.com/decaprime)** for their work on **Bloodstone** and **VampireCommandFramework**
 
