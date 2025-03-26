@@ -9,9 +9,6 @@ using System.Collections.Generic;
 using PrisonerExchange.Extensions;
 using System.Linq;
 using System;
-using static ProjectM.Tiles.TileConstants;
-using static ProjectM.NetherSpawnPositionMetadata;
-using static ProjectM.UI.UISpawningSystem;
 
 namespace PrisonerExchange.Commands;
 
@@ -78,14 +75,15 @@ public class PrisonerService
 
 		Prisonstation prisonStation = prisoncellEntity.Read<Prisonstation>();
 
-		if (prisoncellEntity.TryGetComponent<LocalTransform>(out var transform))
+		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var LocalToWorld))
 		{
-			float3 center = transform.Position;
+			float3 cellCenterPosition = LocalToWorld.Position;
+			Plugin.Logger.LogError("Cell position: " + cellCenterPosition);
 
 			Entity spawnedEntity = Services.UnitSpawnerService.SpawnWithCallback(
 			Entity.Null,
 			prisonerInfo.PrefabGUID,
-			new float2(center.x, center.z),
+			new float2(cellCenterPosition.x, cellCenterPosition.z),
 			-1,
 			(e) =>
 			{
@@ -118,7 +116,7 @@ public class PrisonerService
 				// ImprisonedBuff
 				BuffUtil.BuffNPC(e, initiator.Entity, BuffUtil.ELECTRIC_BUFF, -1);
 			},
-			center.y
+			cellCenterPosition.y
 			);
 		}
 	}
@@ -193,34 +191,6 @@ public class PrisonerService
 			return false;
 
 		return true;
-	}
-
-	/// <summary>
-	/// Calculate prison cell size based on tilebounds
-	/// </summary>
-	public static float2 GetEntitySizeInWorld(Entity entity)
-	{
-		if (!entity.Has<TileBounds>())
-		{
-			Plugin.Logger.Error("PrisonerService", $"Entity {entity.Index} is missing TileBounds.");
-			return new float2(2f, 2f); // fallback default
-		}
-
-		var bounds = entity.Read<TileBounds>().Value;
-		float width = bounds.Max.x - bounds.Min.x;
-		float depth = bounds.Max.y - bounds.Min.y;
-
-		return new float2(width, depth);
-	}
-
-	/// <summary>
-	/// Calculate center coordinates of a prison cell.
-	/// </summary>
-	public static float3 GetPrisoncellCenter(float3 worldPosition, quaternion rotation, float width = 2.0f, float depth = 2.0f)
-	{
-		float3 localOffset = new float3(width / 2f, 0f, depth / 2f);
-		float3 rotatedOffset = math.rotate(rotation, localOffset);
-		return worldPosition + rotatedOffset;
 	}
 
 	public static bool IsSameTeam(Entity prisoncell, UserModel user)

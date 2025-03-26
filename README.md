@@ -5,7 +5,8 @@
 <summary><strong>Staff Commands</strong></summary>
 
 - `.pe clear` Clear all active prisoner exchanges between users.
-- `.pe remove (username)` Remove any sale/swap request involving a specified user. 
+- `.pe remove (username)` Remove any sale/swap request involving a specified user.
+- `.pe removecooldown (username)` Removes command cooldown on specified user.
 
 </details>
 

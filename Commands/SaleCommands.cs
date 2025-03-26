@@ -26,6 +26,12 @@ internal class SaleCommands
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
 		UserModel targetuser = UserUtil.GetUserByCharacterName(username);
 
+		if (!Configuration.SellingEnabled)
+		{
+			ctx.Reply($"{Markup.Prefix}Selling prisoners is not enabled!");
+			return;
+		}
+
 		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "sell"))
 		{
 			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "sell");
@@ -60,6 +66,18 @@ internal class SaleCommands
 		if (localuser.Entity.SameTeam(targetuser.Entity))
 		{
 			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
+			return;
+		}
+
+		if (price < Configuration.MinimumSalePrice)
+		{
+			ctx.Reply($"{Markup.Prefix}You can only sell a prisoner for {Configuration.MinimumSalePrice} {Configuration.CurrencyName} or more!");
+			return;
+		}
+
+		if (price > Configuration.MaximumSalePrice)
+		{
+			ctx.Reply($"{Markup.Prefix}Sale cannot exceed {Configuration.MaximumSalePrice} {Configuration.CurrencyName}!");
 			return;
 		}
 

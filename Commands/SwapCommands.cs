@@ -24,6 +24,12 @@ internal class SwapCommands
 		var localuser = UserUtil.GetCurrentUser(ctx);
 		var targetuser = UserUtil.GetUserByCharacterName(username);
 
+		if (!Configuration.SwappingEnabled)
+		{
+			ctx.Reply($"{Markup.Prefix}Swapping prisoners is not enabled!");
+			return;
+		}
+
 		if (localuser == null || targetuser == null)
 		{
 			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
@@ -39,7 +45,19 @@ internal class SwapCommands
 
 		if (SwapService.SwapExists(localuser) || SwapService.SwapExists(targetuser))
 		{
-			ctx.Reply($"{Markup.Prefix}Both users must not be in an active exchange!");
+			ctx.Reply($"{Markup.Prefix}Both users can not be in an active exchange!");
+			return;
+		}
+
+		if (localuser.Equals(targetuser))
+		{
+			ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with yourself!");
+			return;
+		}
+
+		if (localuser.Entity.SameTeam(targetuser.Entity))
+		{
+			ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with your own teammate!");
 			return;
 		}
 
@@ -52,7 +70,7 @@ internal class SwapCommands
 		var prisonerList = PrisonerService.GetPrisonerList(targetuser);
 		if (prisonerList.Count == 0)
 		{
-			ctx.Reply($"{Markup.Prefix}{username} has no prisoners.");
+			ctx.Reply($"{Markup.Prefix}{username} has no prisoners to swap.");
 			return;
 		}
 

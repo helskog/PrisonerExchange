@@ -13,7 +13,7 @@ internal class AdminCommands
 	/// <summary>
 	/// Removes a specific user's active sale or swap request.
 	/// </summary>
-	[Command("pe remove", description: "Remove a specific user’s active prisoner sale or swap.", adminOnly: true)]
+	[Command("pe remove", description: "Remove a specific user’s pending prisoner sale or swap.", adminOnly: true)]
 	public void RemoveExchange(ChatCommandContext ctx, string from = "username")
 	{
 		var user = UserUtil.GetUserByCharacterName(from);
@@ -66,7 +66,7 @@ internal class AdminCommands
 	/// <summary>
 	/// Clears all active cooldowns on specific user
 	/// </summary>
-	[Command("removecooldown", "Removes command cooldowns for a user")]
+	[Command("pe removecooldown", "Removes command cooldowns for a user")]
 	public static void RemoveCooldownCommand(ChatCommandContext ctx, string targetUserName)
 	{
 		var targetUser = UserUtil.GetUserByCharacterName(targetUserName);
