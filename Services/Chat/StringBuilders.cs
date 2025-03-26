@@ -31,7 +31,7 @@ public class StringBuilders
 		sb.AppendLine($"Prisoner type: {prisonerInfo.UnitType}");
 		sb.AppendLine($"Prisoner blood: {Markup.Highlight($"{prisonerInfo.BloodQuality}% {prisonerInfo.BloodType}")}");
 		sb.AppendLine();
-		sb.AppendLine($"Type {Markup.Highlight(".pe sale accept")} while standing next to an empty prison cell.");
+		sb.AppendLine($"Type {Markup.Highlight(".pe acceptsale")} while standing next to an empty prison cell.");
 
 		return sb.ToString();
 	}
@@ -44,7 +44,7 @@ public class StringBuilders
 		sb.AppendLine($"Offering: {Markup.Highlight($"{swap.PrisonerB.Info.UnitType}")} " + Markup.Secondary($"{swap.PrisonerB.Info.BloodQuality}% {swap.PrisonerB.Info.BloodType}"));
 		sb.AppendLine($"For your: {Markup.Highlight($"{swap.PrisonerA.Info.UnitType}")} " + Markup.Secondary($"{swap.PrisonerA.Info.BloodQuality}% {swap.PrisonerA.Info.BloodType}"));
 		sb.AppendLine();
-		sb.AppendLine($"Type {Markup.Highlight(".pe swap accept")} to complete the swap.");
+		sb.AppendLine($"Type {Markup.Highlight(".pe acceptswap")} to complete the swap.");
 
 		return sb.ToString();
 	}

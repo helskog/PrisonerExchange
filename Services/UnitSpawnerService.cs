@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace PrisonerExchange.Services;
 
-// All credits to Odjit, kindred-commands for the post-actions fix and patch to apply properties on spawn.
+// All credits to Odjit, kindred-commands for NPC spawning patch / callback function.
 internal class UnitSpawnerService
 {
 	private static Entity empty_entity = new();

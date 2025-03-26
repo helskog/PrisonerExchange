@@ -13,6 +13,11 @@ using Unity.Entities;
 
 namespace PrisonerExchange.Patches;
 
+/// <summary>
+/// This patch is only necessary to enable our PromptHelper.
+/// See the .pe sell command for reference on how we use prompt-helper to get secondary
+/// input from the user when prompted for it.
+/// </summary>
 [HarmonyPatch(typeof(ChatMessageSystem), nameof(ChatMessageSystem.OnUpdate))]
 [HarmonyPriority(400)]
 public static class ChatSystemPromptPatch

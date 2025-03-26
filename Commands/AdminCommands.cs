@@ -14,12 +14,12 @@ internal class AdminCommands
 	/// Removes a specific user's active sale or swap request.
 	/// </summary>
 	[Command("pe remove", description: "Remove a specific user’s pending prisoner sale or swap.", adminOnly: true)]
-	public void RemoveExchange(ChatCommandContext ctx, string from = "username")
+	public void RemoveExchange(ChatCommandContext ctx, string username)
 	{
-		var user = UserUtil.GetUserByCharacterName(from);
+		var user = UserUtil.GetUserByCharacterName(username);
 		if (user == null)
 		{
-			ctx.Reply($"{Markup.Prefix}No user found: {Markup.Highlight(from)}.");
+			ctx.Reply($"{Markup.Prefix}No user found: {Markup.Highlight(username)}.");
 			return;
 		}
 
@@ -48,35 +48,47 @@ internal class AdminCommands
 			return;
 		}
 
-		ctx.Reply($"{Markup.Prefix}No active sale or swap found for user: {Markup.Highlight(from)}.");
+		ctx.Reply($"{Markup.Prefix}No active sale or swap found for user: {Markup.Highlight(username)}.");
 	}
 
 	/// <summary>
-	/// Clears all active sales and swaps.
+	/// Clear all active sales and swaps.
 	/// </summary>
 	[Command("pe clear", description: "Clear all active prisoner exchanges (both sales and swaps).", adminOnly: true)]
 	public void ClearExchanges(ChatCommandContext ctx)
 	{
+		var allSales = SalesService.GetAll();
+		foreach (var sale in allSales)
+		{
+			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		}
 		SalesService.ClearAll();
+
+		var allSwaps = SwapService.GetAll();
+		foreach (var swap in allSwaps)
+		{
+			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		}
 		SwapService.ClearAll();
 
 		ctx.Reply($"{Markup.Prefix}Cleared all active prisoner sales and swaps!");
 	}
 
 	/// <summary>
-	/// Clears all active cooldowns on specific user
+	/// Clear all active cooldowns on specific user
 	/// </summary>
 	[Command("pe removecooldown", "Removes command cooldowns for a user")]
-	public static void RemoveCooldownCommand(ChatCommandContext ctx, string targetUserName)
+	public static void RemoveCooldownCommand(ChatCommandContext ctx, string username)
 	{
-		var targetUser = UserUtil.GetUserByCharacterName(targetUserName);
+		var targetUser = UserUtil.GetUserByCharacterName(username);
 		if (targetUser == null)
 		{
-			ctx.Reply($"{Markup.Prefix}Could not find user {targetUserName}.");
+			ctx.Reply($"{Markup.Prefix}Could not find user {username}.");
 			return;
 		}
 
-		ctx.Reply($"{Markup.Prefix}Removed all cooldowns for user {targetUserName}.");
+		ctx.Reply($"{Markup.Prefix}Removed all cooldowns for user {username}.");
 		CooldownTracker.ClearAllCooldowns(targetUser.PlatformId);
 	}
 }

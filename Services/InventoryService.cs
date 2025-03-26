@@ -14,6 +14,7 @@ public class InventoryService
 {
 	public static PrefabGUID currencyPrefab = new PrefabGUID(int.Parse(Configuration.CurrencyPrefab));
 
+	// Credits to BloodyCore, Kindred for reference
 	public static AddItemResponse TryAddUserInventoryItem(Entity CharacterEntity, PrefabGUID itemGuid, int stacks)
 	{
 		if (Core.ServerScriptMapper == null)

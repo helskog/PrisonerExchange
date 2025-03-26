@@ -30,9 +30,9 @@ internal class SwapCommands
 			return;
 		}
 
-		if (SwapService.SwapExists(targetuser))
+		if (SwapService.SwapExists(targetuser) || SalesService.SaleExists(targetuser))
 		{
-			ctx.Reply($"{Markup.Prefix}Target user can not be in an active exchange!");
+			ctx.Reply($"{Markup.Prefix}Target already have a pending exchange offer!");
 			return;
 		}
 
@@ -134,39 +134,32 @@ internal class SwapCommands
 	[Command("acceptswap", description: "Accept incoming prisoner swap request")]
 	public static void AcceptSwap(ChatCommandContext ctx)
 	{
-		Plugin.Logger.LogError("1");
 		var localuser = UserUtil.GetCurrentUser(ctx);
-		Plugin.Logger.LogError("2");
 		if (localuser == null)
 		{
-			Plugin.Logger.LogError("3");
 			ctx.Reply($"{Markup.Prefix}Could not determine your identity.");
 			return;
 		}
-		Plugin.Logger.LogError("4");
+
 		var swap = SwapService.GetActiveSwap(localuser);
-		Plugin.Logger.LogError("5");
 		if (swap == null)
 		{
-			Plugin.Logger.LogError("6");
 			ctx.Reply($"{Markup.Prefix}No swap request to accept.");
 			return;
 		}
-		Plugin.Logger.LogError("7");
+
 		bool result = PrisonerService.SwapPrisoner(swap.PrisonerA, swap.PrisonerB, localuser);
-		Plugin.Logger.LogError("8");
 		if (!result)
 		{
-			Plugin.Logger.LogError("9");
 			ctx.Reply($"{Markup.Prefix}Something went wrong during the swap.");
 			return;
 		}
-		Plugin.Logger.LogError("10");
+
 		SwapService.RemoveSwap(swap.Seller);
-		Plugin.Logger.LogError("11");
+
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
 			$"{Markup.Prefix}{localuser.CharacterName} has accepted your prisoner swap.");
-		Plugin.Logger.LogError("12");
+
 		ctx.Reply($"{Markup.Prefix}Swap complete.");
 	}
 

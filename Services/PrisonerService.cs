@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using PrisonerExchange.Extensions;
 using System.Linq;
 using System;
+using Stunlock.Core;
 
 namespace PrisonerExchange.Commands;
 
@@ -75,9 +76,10 @@ public class PrisonerService
 
 		Prisonstation prisonStation = prisoncellEntity.Read<Prisonstation>();
 
-		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var LocalToWorld))
+		if (prisoncellEntity.TryGetComponent<LocalTransform>(out var transform))
 		{
-			float3 cellCenterPosition = LocalToWorld.Position;
+			float3 cellCenterPosition = transform.Position;
+			quaternion cellRotation = transform.Rotation;
 
 			Entity spawnedEntity = Services.UnitSpawnerService.SpawnWithCallback(
 			Entity.Null,
@@ -98,6 +100,7 @@ public class PrisonerService
 				Imprisoned imprisoned = new Imprisoned();
 				imprisoned.PrisonCellEntity = prisoncellEntity;
 
+				// Thanks Dawiss
 				BehaviourTreeState behaviourTreeState = e.Read<BehaviourTreeState>();
 				behaviourTreeState.Value = GenericEnemyState.Imprisoned;
 				BehaviourTreeStateMetadata behaviourTreeStateMetadata = e.Read<BehaviourTreeStateMetadata>();
@@ -113,7 +116,7 @@ public class PrisonerService
 				prisoncellEntity.Write(prisonStation);
 
 				// ImprisonedBuff
-				BuffUtil.BuffNPC(e, initiator.Entity, BuffUtil.ELECTRIC_BUFF, -1);
+				BuffUtil.BuffNPC(e, initiator.Entity, new PrefabGUID(1603329680), -1);
 			},
 			cellCenterPosition.y
 			);
@@ -192,6 +195,9 @@ public class PrisonerService
 		return true;
 	}
 
+	/// <summary>
+	/// Check if cell's team component value matches user
+	/// </summary>
 	public static bool IsSameTeam(Entity prisoncell, UserModel user)
 	{
 		var castleTeamId = prisoncell.Read<Team>().Value;

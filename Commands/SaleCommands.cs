@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-using PrisonerExchange.Extensions;
+﻿using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
 using PrisonerExchange.Services.Chat;
@@ -32,9 +30,9 @@ internal class SaleCommands
 			return;
 		}
 
-		if (SalesService.GetAll().Any(s => s.Buyer == targetuser || s.Seller == targetuser))
+		if (SalesService.SaleExists(targetuser) || SwapService.SwapExists(targetuser))
 		{
-			ctx.Reply($"{Markup.Prefix}Target user already has a pending offer. They must finish the exchange before getting a new offer!");
+			ctx.Reply($"{Markup.Prefix}Target already have a pending exchange offer!");
 			return;
 		}
 
