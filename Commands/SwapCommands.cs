@@ -44,7 +44,6 @@ internal class SwapCommands
 
 		if (!localuser.IsAdmin)
 		{
-			Plugin.Logger.LogError("Is not admin " + localuser.CharacterName);
 			if (!Configuration.SwappingEnabled)
 			{
 				ctx.Reply($"{Markup.Prefix}Swapping prisoners is not enabled!");

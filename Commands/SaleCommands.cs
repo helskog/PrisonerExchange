@@ -133,7 +133,7 @@ internal class SaleCommands
 		Plugin.Logger.Info("UserCommands", $"User '{localuser.CharacterName}' initiated prisoner sale to '{targetuser.CharacterName}' for {price} {Configuration.CurrencyName}.");
 
 		// Buff active request NPC to visualize.
-		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, 120);
+		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
 
 		// Send message to receiving user.
 		string msg = StringBuilders.SalesInfoMessage(newSale);
