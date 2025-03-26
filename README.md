@@ -14,9 +14,9 @@
 <summary><strong>Sale commands</strong></summary>
 
 - `.pe sell (username) (price)` Sends a sale offer to the specified username.
-- `.pe sale cancel` Cancel outgoing sale offer.
-- `.pe sale accept` Accept incoming sale offer.
-- `.pe sale decline` Decline incoming sale offer.
+- `.pe cancelsale` Cancel outgoing sale offer.
+- `.pe acceptsale` Accept incoming sale offer.
+- `.pe declinesale` Decline incoming sale offer.
 
 </details>
 
@@ -24,9 +24,9 @@
 <summary><strong>Swap commands</strong></summary>
 
 - `.pe swap (username)` Initiate a trade with another user (prisoner for prisoner).
-- `.pe swap cancel` Cancel outgoing swap offer.
-- `.pe swap accept` Accept incoming swap offer.
-- `.pe swap decline` Decline incoming swap offer.
+- `.pe cancelswap` Cancel outgoing swap offer.
+- `.pe acceptswap` Accept incoming swap offer.
+- `.pe declineswap` Decline incoming swap offer.
 
 </details>
 

@@ -22,16 +22,8 @@ internal class UnitSpawnerService
 {
 	private static Entity empty_entity = new();
 
-	internal const int DEFAULT_MINRANGE = 1;
-	internal const int DEFAULT_MAXRANGE = 1;
-
-	public static void Spawn(Entity user, PrefabGUID unit, int count, float2 position, float minRange = 1, float maxRange = 2, float duration = -1)
-	{
-		var translation = Core.EntityManager.GetComponentData<Translation>(user);
-		var pos = new float3(position.x, translation.Value.y, position.y);
-		var usus = Core.Server.GetExistingSystemManaged<UnitSpawnerUpdateSystem>();
-		usus.SpawnUnit(empty_entity, unit, pos, count, minRange, maxRange, duration);
-	}
+	internal const int DEFAULT_MINRANGE = 0;
+	internal const int DEFAULT_MAXRANGE = 0;
 
 	public static Entity SpawnWithCallback(Entity user, PrefabGUID unit, float2 position, float duration, Action<Entity> postActions, float yPosition = -1)
 	{

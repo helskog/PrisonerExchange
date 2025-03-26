@@ -4,6 +4,7 @@ namespace PrisonerExchange;
 
 internal class Configuration
 {
+	internal static bool AdminBypass { get; private set; }
 	internal static bool SellingEnabled { get; private set; }
 	internal static bool SwappingEnabled { get; private set; }
 
@@ -20,6 +21,7 @@ internal class Configuration
 
 	internal static void Initialize(ConfigFile config)
 	{
+		AdminBypass = config.Bind("General", "AdminBypass", true, "Allow admins to bypass restrictions on selling/swapping prisoners.").Value;
 		SellingEnabled = config.Bind("General", "SellingEnabled", true, "Enable or disable the ability to sell prisoners.").Value;
 		SwappingEnabled = config.Bind("General", "SwappingEnabled", true, "Enable or disable the ability to swap prisoners.").Value;
 

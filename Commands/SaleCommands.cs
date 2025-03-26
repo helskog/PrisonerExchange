@@ -26,19 +26,6 @@ internal class SaleCommands
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
 		UserModel targetuser = UserUtil.GetUserByCharacterName(username);
 
-		if (!Configuration.SellingEnabled)
-		{
-			ctx.Reply($"{Markup.Prefix}Selling prisoners is not enabled!");
-			return;
-		}
-
-		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "sell"))
-		{
-			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "sell");
-			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using /swap accept again!");
-			return;
-		}
-
 		if (targetuser == null)
 		{
 			ctx.Reply($"{Markup.Prefix}Could not find user with the name {Markup.Highlight(username)}.");
@@ -57,28 +44,53 @@ internal class SaleCommands
 			return;
 		}
 
-		if (localuser.Equals(targetuser))
+		if (!localuser.IsAdmin)
 		{
-			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
-			return;
-		}
+			if (!Configuration.SellingEnabled)
+			{
+				ctx.Reply($"{Markup.Prefix}Selling prisoners is not enabled!");
+				return;
+			}
 
-		if (localuser.Entity.SameTeam(targetuser.Entity))
-		{
-			ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
-			return;
-		}
+			if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "sell"))
+			{
+				var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "sell");
+				ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using /swap accept again!");
+				return;
+			}
 
-		if (price < Configuration.MinimumSalePrice)
-		{
-			ctx.Reply($"{Markup.Prefix}You can only sell a prisoner for {Configuration.MinimumSalePrice} {Configuration.CurrencyName} or more!");
-			return;
-		}
+			if (localuser.Equals(targetuser))
+			{
+				ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to yourself!");
+				return;
+			}
 
-		if (price > Configuration.MaximumSalePrice)
-		{
-			ctx.Reply($"{Markup.Prefix}Sale cannot exceed {Configuration.MaximumSalePrice} {Configuration.CurrencyName}!");
-			return;
+			if (localuser.Entity.SameTeam(targetuser.Entity))
+			{
+				ctx.Reply($"{Markup.Prefix}Cannot sell a prisoner to your own teammate!");
+				return;
+			}
+
+			if (price < Configuration.MinimumSalePrice)
+			{
+				ctx.Reply($"{Markup.Prefix}You can only sell a prisoner for {Configuration.MinimumSalePrice} {Configuration.CurrencyName} or more!");
+				return;
+			}
+
+			if (price > Configuration.MaximumSalePrice)
+			{
+				ctx.Reply($"{Markup.Prefix}Sale cannot exceed {Configuration.MaximumSalePrice} {Configuration.CurrencyName}!");
+				return;
+			}
+
+			if (Configuration.ClanLeaderOnly)
+			{
+				if (!localuser.IsClanLeader)
+				{
+					ctx.Reply($"{Markup.Prefix}Only clan leaders are allowed to sell prisoners!");
+					return;
+				}
+			}
 		}
 
 		Entity prisonCellEntity = EntityUtil.FindClosestInRadius<PrisonCell>(localuser.Entity, 5);
@@ -93,15 +105,6 @@ internal class SaleCommands
 		{
 			ctx.Reply($"{Markup.Prefix}You cannot sell another clans prisoner!");
 			return;
-		}
-
-		if (Configuration.ClanLeaderOnly)
-		{
-			if (!localuser.IsClanLeader)
-			{
-				ctx.Reply($"{Markup.Prefix}Only clan leaders are allowed to sell prisoners!");
-				return;
-			}
 		}
 
 		if (!Core.EntityManager.TryGetComponentData<PrisonCell>(prisonCellEntity, out var prisonCellData))
@@ -148,7 +151,7 @@ internal class SaleCommands
 	/// Cancel outgoing exchange request.
 	/// </summary>
 
-	[Command("sale cancel", description: "Cancel your outgoing exchange request.")]
+	[Command("cancelsale", description: "Cancel your outgoing exchange request.")]
 	public static void CancelCommand(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -174,7 +177,7 @@ internal class SaleCommands
 	/// Accept incoming prisoner exchange request.
 	/// </summary>
 
-	[Command("sale accept", description: "Accept incoming prisoner exchange request.")]
+	[Command("acceptsale", description: "Accept incoming prisoner exchange request.")]
 	public static void AcceptExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);
@@ -248,7 +251,7 @@ internal class SaleCommands
 	/// <summary>
 	/// Decline incoming prisoner exchange.
 	/// </summary>
-	[Command("sale decline", description: "Decline incoming prisoner exchange request.")]
+	[Command("declinesale", description: "Decline incoming prisoner exchange request.")]
 	public static void DeclineExchange(ChatCommandContext ctx)
 	{
 		UserModel localuser = UserUtil.GetCurrentUser(ctx);

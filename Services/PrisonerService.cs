@@ -78,7 +78,6 @@ public class PrisonerService
 		if (prisoncellEntity.TryGetComponent<LocalToWorld>(out var LocalToWorld))
 		{
 			float3 cellCenterPosition = LocalToWorld.Position;
-			Plugin.Logger.LogError("Cell position: " + cellCenterPosition);
 
 			Entity spawnedEntity = Services.UnitSpawnerService.SpawnWithCallback(
 			Entity.Null,

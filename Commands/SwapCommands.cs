@@ -24,47 +24,51 @@ internal class SwapCommands
 		var localuser = UserUtil.GetCurrentUser(ctx);
 		var targetuser = UserUtil.GetUserByCharacterName(username);
 
-		if (!Configuration.SwappingEnabled)
+		if (targetuser == null)
 		{
-			ctx.Reply($"{Markup.Prefix}Swapping prisoners is not enabled!");
+			ctx.Reply($"{Markup.Prefix}Could not locate target user.");
 			return;
 		}
 
-		if (localuser == null || targetuser == null)
+		if (SwapService.SwapExists(targetuser))
 		{
-			ctx.Reply($"{Markup.Prefix}Could not locate one or both users.");
+			ctx.Reply($"{Markup.Prefix}Target user can not be in an active exchange!");
 			return;
 		}
 
-		if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "swap"))
+		if (!targetuser.User.IsConnected)
 		{
-			var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "swap");
-			ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using .pe swap again.");
+			ctx.Reply($"{Markup.Prefix}Target user needs to be online!");
 			return;
 		}
 
-		if (SwapService.SwapExists(localuser) || SwapService.SwapExists(targetuser))
+		if (!localuser.IsAdmin)
 		{
-			ctx.Reply($"{Markup.Prefix}Both users can not be in an active exchange!");
-			return;
-		}
+			Plugin.Logger.LogError("Is not admin " + localuser.CharacterName);
+			if (!Configuration.SwappingEnabled)
+			{
+				ctx.Reply($"{Markup.Prefix}Swapping prisoners is not enabled!");
+				return;
+			}
 
-		if (localuser.Equals(targetuser))
-		{
-			ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with yourself!");
-			return;
-		}
+			if (CooldownTracker.IsOnCooldown(localuser.PlatformId, "swap"))
+			{
+				var remaining = CooldownTracker.GetRemainingSeconds(localuser.PlatformId, "swap");
+				ctx.Reply($"{Markup.Prefix}You must wait another {(int)remaining} seconds before using .pe swap again.");
+				return;
+			}
 
-		if (localuser.Entity.SameTeam(targetuser.Entity))
-		{
-			ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with your own teammate!");
-			return;
-		}
+			if (localuser.Equals(targetuser))
+			{
+				ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with yourself!");
+				return;
+			}
 
-		if (!localuser.User.IsConnected || !targetuser.User.IsConnected)
-		{
-			ctx.Reply($"{Markup.Prefix}Both users need to be online!");
-			return;
+			if (localuser.Entity.SameTeam(targetuser.Entity))
+			{
+				ctx.Reply($"{Markup.Prefix}Cannot swap a prisoner with your own teammate!");
+				return;
+			}
 		}
 
 		var prisonerList = PrisonerService.GetPrisonerList(targetuser);
@@ -127,40 +131,46 @@ internal class SwapCommands
 	/// <summary>
 	/// Accept swap request
 	/// </summary>
-	[Command("swap accept", description: "Accept incoming prisoner swap request")]
+	[Command("acceptswap", description: "Accept incoming prisoner swap request")]
 	public static void AcceptSwap(ChatCommandContext ctx)
 	{
+		Plugin.Logger.LogError("1");
 		var localuser = UserUtil.GetCurrentUser(ctx);
+		Plugin.Logger.LogError("2");
 		if (localuser == null)
 		{
+			Plugin.Logger.LogError("3");
 			ctx.Reply($"{Markup.Prefix}Could not determine your identity.");
 			return;
 		}
-
+		Plugin.Logger.LogError("4");
 		var swap = SwapService.GetActiveSwap(localuser);
+		Plugin.Logger.LogError("5");
 		if (swap == null)
 		{
+			Plugin.Logger.LogError("6");
 			ctx.Reply($"{Markup.Prefix}No swap request to accept.");
 			return;
 		}
-
+		Plugin.Logger.LogError("7");
 		bool result = PrisonerService.SwapPrisoner(swap.PrisonerA, swap.PrisonerB, localuser);
-
+		Plugin.Logger.LogError("8");
 		if (!result)
 		{
+			Plugin.Logger.LogError("9");
 			ctx.Reply($"{Markup.Prefix}Something went wrong during the swap.");
 			return;
 		}
-
+		Plugin.Logger.LogError("10");
 		SwapService.RemoveSwap(swap.Seller);
-
+		Plugin.Logger.LogError("11");
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
 			$"{Markup.Prefix}{localuser.CharacterName} has accepted your prisoner swap.");
-
+		Plugin.Logger.LogError("12");
 		ctx.Reply($"{Markup.Prefix}Swap complete.");
 	}
 
-	[Command("swap decline", description: "Decline incoming prisoner swap request")]
+	[Command("declineswap", description: "Decline incoming prisoner swap request")]
 	public static void DeclineSwap(ChatCommandContext ctx)
 	{
 		var localuser = UserUtil.GetCurrentUser(ctx);
@@ -191,7 +201,7 @@ internal class SwapCommands
 				$"Swap request from '{swap.Seller.CharacterName}' declined by '{swap.Buyer.CharacterName}'.");
 	}
 
-	[Command("swap cancel", description: "Cancel your outgoing prisoner swap request")]
+	[Command("cancelswap", description: "Cancel your outgoing prisoner swap request")]
 	public static void CancelSwap(ChatCommandContext ctx)
 	{
 		var localuser = UserUtil.GetCurrentUser(ctx);
