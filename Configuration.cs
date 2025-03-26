@@ -29,7 +29,7 @@ internal class Configuration
 		CurrencyPrefab = config.Bind("General", "CurrencyPrefab", "-257494203", "Prefab GUID for the currency. (Crystals by default)").Value;
 		CurrencyName = config.Bind("General", "CurrencyName", "Crystals", "Name of currency.").Value;
 		MinimumSalePrice = config.Bind("General", "MinimumSalePrice", 100, "Set the minimum amount of currency required for a sale.").Value;
-		MaximumSalePrice = config.Bind("General", "MinimumSalePrice", 5000, "Set the maximum amount of currency allowed for a sale.").Value;
+		MaximumSalePrice = config.Bind("General", "MaximumSalePrice", 5000, "Set the maximum amount of currency allowed for a sale.").Value;
 
 		ClanLeaderOnly = config.Bind("General", "ClanLeaderOnly", false, "Only allow clan leader to sell prisoners.").Value;
 
