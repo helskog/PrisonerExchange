@@ -1,5 +1,12 @@
 # PrisonerExchange
 
+## Features
+- Light/dark mode toggle
+- Live previews
+- Fullscreen mode
+- Cross platform
+
+
 ## Commands
 <details>
 <summary><strong>Staff Commands</strong></summary>
@@ -30,6 +37,69 @@
 
 </details>
 
+## Configuration
+The config file is automatically generated under the server install directory as `\BepInEx\config\PrisonerExchange.cfg`
+<details>
+<summary><strong>Sample configuration</strong></summary>
+
+```CFG
+## Allow admins to bypass restrictions on selling/swapping prisoners.
+# Setting type: Boolean
+# Default value: true
+AdminBypass = true
+
+## Enable or disable the ability to sell prisoners.
+# Setting type: Boolean
+# Default value: true
+SellingEnabled = true
+
+## Enable or disable the ability to swap prisoners.
+# Setting type: Boolean
+# Default value: true
+SwappingEnabled = true
+
+## Announce completed sales in global chat.
+# Setting type: Boolean
+# Default value: true
+AnnounceExchange = true
+
+## Prefab GUID for the currency. (Crystals by default)
+# Setting type: String
+# Default value: -257494203
+CurrencyPrefab = -257494203
+
+## Name of currency.
+# Setting type: String
+# Default value: Crystals
+CurrencyName = Crystals
+
+## Set the minimum amount of currency required for a sale.
+# Setting type: Int32
+# Default value: 100
+MinimumSalePrice = 100
+
+## Set the maximum amount of currency allowed for a sale.
+# Setting type: Int32
+# Default value: 5000
+MaximumSalePrice = 5000
+
+## Only allow clan leader to sell prisoners.
+# Setting type: Boolean
+# Default value: false
+ClanLeaderOnly = false
+
+## Adds a fixed cooldown period for selling/swapping prisoners (minutes).
+# Setting type: Int32
+# Default value: 5
+CommandCoolDownPeriod = 5
+
+## Automatically expire sales and swap requests. (seconds)
+# Setting type: Int32
+# Default value: 60
+ExpireExchangeAfter = 60
+```
+
+</details>
 ## Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Cmmunity. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
