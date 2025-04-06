@@ -58,7 +58,7 @@ public class InventoryService
 	public static bool CanAfford(UserModel user, int price)
 	{
 		Entity userCharacterEntity = user.User.LocalCharacter._Entity;
-		int totalCurrency = InventoryUtilities.GetItemAmount(Core.EntityManager, userCharacterEntity, new PrefabGUID(-257494203));
+		int totalCurrency = InventoryUtilities.GetItemAmount(Core.EntityManager, userCharacterEntity, currencyPrefab);
 		Plugin.Logger.Info("InventoryService", $"Currency in inventory: {totalCurrency}");
 
 		if (totalCurrency >= price)
