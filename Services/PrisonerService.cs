@@ -159,6 +159,12 @@ public class PrisonerService
 		PrisonerModel.PrisonerInformation prisonerInformationA = PrisonerA.Info;
 		PrisonerModel.PrisonerInformation prisonerInformationB = PrisonerB.Info;
 
+		if (Core.EntityManager.HasComponent<Imprisoned>(PrisonerA.PrisonerEntity))
+			Core.EntityManager.RemoveComponent<Imprisoned>(PrisonerA.PrisonerEntity);
+
+		if (Core.EntityManager.HasComponent<Imprisoned>(PrisonerB.PrisonerEntity))
+			Core.EntityManager.RemoveComponent<Imprisoned>(PrisonerB.PrisonerEntity);
+
 		// Kill both prisoners
 		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerA.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
