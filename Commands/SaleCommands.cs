@@ -6,6 +6,7 @@ using PrisonerExchange.Utility;
 
 using ProjectM;
 
+using Unity.Collections;
 using Unity.Entities;
 
 using VampireCommandFramework;
@@ -136,11 +137,12 @@ internal class SaleCommands
 		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
 
 		// Send message to receiving user.
-		string msg = StringBuilders.SalesInfoMessage(newSale);
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
+		var msg = new FixedString512Bytes(StringBuilders.SalesInfoMessage(newSale));
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, ref msg);
 
 		// Inform sender that the offer has been sent.
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, $"{Markup.Prefix}Request sent to user {targetuser.CharacterName}");
+		var informMessage = new FixedString512Bytes($"{Markup.Prefix}Request sent to user {targetuser.CharacterName}");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, localuser.User, ref informMessage);
 
 		CooldownTracker.SetCooldown(localuser.PlatformId, "sell");
 	}
@@ -229,12 +231,14 @@ internal class SaleCommands
 
 		if (!InventoryService.AddCurrencyToInventory(seller, price))
 		{
-			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, seller.User, $"Something went wrong when paying out {price} {Configuration.CurrencyName} contact an administrator!");
+			var payoutErrorMessage = new FixedString512Bytes($"Something went wrong when paying out {price} {Configuration.CurrencyName} contact an administrator!");
+			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, seller.User, ref payoutErrorMessage);
 		}
 
 		// Complete transaction
 		SalesService.RemoveSale(seller);
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, seller.User, $"{localuser.CharacterName} has purchased your prisoner for {price} {Configuration.CurrencyName}!");
+		var completedTransactionMessage = new FixedString512Bytes($"{localuser.CharacterName} has purchased your prisoner for {price} {Configuration.CurrencyName}!");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, seller.User, ref completedTransactionMessage);
 
 		Plugin.Logger.Info("UserCommands", $"Prisoner sale accepted : Buyer='{localuser.CharacterName}', Seller='{seller.CharacterName}', Price={price}.");
 
@@ -264,7 +268,8 @@ internal class SaleCommands
 		ctx.Reply($"{Markup.Prefix}Exchange request from {sale.Seller.CharacterName} has been declined.");
 
 		// Send message to seller
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, sale.Seller.User, $"{Markup.Prefix} {sale.Buyer.CharacterName} has declined your exchange request.");
+		var declinedExchangeMessage = new FixedString512Bytes($"{Markup.Prefix} {sale.Buyer.CharacterName} has declined your exchange request.");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, sale.Seller.User, ref declinedExchangeMessage);
 
 		// Remove sale
 		SalesService.RemoveSale(sale.Seller);

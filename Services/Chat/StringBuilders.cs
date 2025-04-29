@@ -5,6 +5,8 @@ using PrisonerExchange.Models;
 
 using ProjectM;
 
+using Unity.Collections;
+
 using VampireCommandFramework;
 
 namespace PrisonerExchange.Services.Chat;
@@ -15,9 +17,9 @@ public class StringBuilders
 	{
 		var prisonerInfo = sale.GetPrisonerInformation;
 
-		var msg = $"{Markup.Prefix}{sale.Buyer.CharacterName} has purchased {prisonerInfo.UnitType} with {prisonerInfo.BloodQuality}%" +
-						$"{prisonerInfo.BloodType} from {sale.Seller.CharacterName}!";
-		ServerChatUtils.SendSystemMessageToAllClients(Core.EntityManager, msg);
+		var msg = new FixedString512Bytes($"{Markup.Prefix}{sale.Buyer.CharacterName} has purchased {prisonerInfo.UnitType} with {prisonerInfo.BloodQuality}%" +
+						$"{prisonerInfo.BloodType} from {sale.Seller.CharacterName}!");
+		ServerChatUtils.SendSystemMessageToAllClients(Core.EntityManager, ref msg);
 	}
 
 	public static string SalesInfoMessage(PendingSale sale)

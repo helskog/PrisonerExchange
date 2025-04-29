@@ -8,6 +8,8 @@ using PrisonerExchange.Models;
 
 using ProjectM;
 
+using Unity.Collections;
+
 namespace PrisonerExchange.Services;
 
 public static class SalesService
@@ -80,11 +82,12 @@ public static class SalesService
 			foreach (var expired in SalesList.Where(sale => (DateTime.UtcNow - sale.CreatedAt).TotalSeconds >= sale.LifetimeSeconds).ToList())
 			{
 				// Notify players
-				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Seller.User,
-						$"{Markup.Prefix}Your prisoner exchange request to {expired.Buyer.CharacterName} has expired.");
+				var expiredSellerMessage = new FixedString512Bytes($"{Markup.Prefix}Your prisoner exchange request to {expired.Buyer.CharacterName} has expired.");
+				var expiredBuyerMessage = new FixedString512Bytes($"{Markup.Prefix}The prisoner exchange request from {expired.Seller.CharacterName} has expired.");
 
-				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Buyer.User,
-						$"{Markup.Prefix}The prisoner exchange request from {expired.Seller.CharacterName} has expired.");
+				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Seller.User, ref expiredSellerMessage);
+
+				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Buyer.User, ref expiredBuyerMessage);
 
 				SalesList.Remove(expired);
 			}

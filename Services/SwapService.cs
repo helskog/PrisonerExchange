@@ -9,6 +9,8 @@ using PrisonerExchange.Utility;
 
 using ProjectM;
 
+using Unity.Collections;
+
 namespace PrisonerExchange.Services;
 
 public static class SwapService
@@ -85,13 +87,13 @@ public static class SwapService
 
 				if (ex.Seller.User.IsConnected)
 				{
-					var msg = $"{Markup.Prefix}Your prisoner swap request with {ex.Buyer.CharacterName} has expired.";
-					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Seller.User, msg);
+					var msg = new FixedString512Bytes($"{Markup.Prefix}Your prisoner swap request with {ex.Buyer.CharacterName} has expired.");
+					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Seller.User, ref msg);
 				}
 				if (ex.Buyer.User.IsConnected)
 				{
-					var msg = $"{Markup.Prefix}A prisoner swap request from {ex.Seller.CharacterName} has expired.";
-					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Buyer.User, msg);
+					var msg = new FixedString512Bytes($"{Markup.Prefix}A prisoner swap request from {ex.Seller.CharacterName} has expired.");
+					ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Buyer.User, ref msg);
 				}
 
 				// Trt remove buff from both prisoners

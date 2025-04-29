@@ -6,6 +6,7 @@ using PrisonerExchange.Utility;
 
 using ProjectM;
 
+using Unity.Collections;
 using Unity.Entities;
 
 using VampireCommandFramework;
@@ -118,8 +119,8 @@ internal class SwapCommands
 			BuffUtil.BuffNPC(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
 			BuffUtil.BuffNPC(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
 
-			var msg = StringBuilders.SwapInfoMessage(swap);
-			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, msg);
+			var msg = new FixedString512Bytes(StringBuilders.SwapInfoMessage(swap));
+			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, ref msg);
 
 			CooldownTracker.SetCooldown(localuser.PlatformId, "swap");
 
@@ -156,8 +157,8 @@ internal class SwapCommands
 
 		SwapService.RemoveSwap(swap.Seller);
 
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
-			$"{Markup.Prefix}{localuser.CharacterName} has accepted your prisoner swap.");
+		var acceptedSwapMessage = new FixedString512Bytes($"{Markup.Prefix}{localuser.CharacterName} has accepted your prisoner swap.");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User, ref acceptedSwapMessage);
 
 		ctx.Reply($"{Markup.Prefix}Swap complete.");
 	}
@@ -181,8 +182,8 @@ internal class SwapCommands
 		}
 
 		ctx.Reply($"{Markup.Prefix}Swap request from {swap.Seller.CharacterName} has been declined.");
-		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User,
-				$"{Markup.Prefix}Your swap request was declined by {swap.Buyer.CharacterName}.");
+		var swapDeclinedMessage = new FixedString512Bytes($"{Markup.Prefix}Your swap request was declined by {swap.Buyer.CharacterName}.");
+		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User, ref swapDeclinedMessage);
 
 		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
 		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);

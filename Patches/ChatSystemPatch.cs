@@ -48,7 +48,8 @@ public static class ChatSystemPromptPatch
 					if (message.Equals("!s", StringComparison.OrdinalIgnoreCase))
 					{
 						PromptManager.CancelPrompt(userId);
-						ServerChatUtils.SendSystemMessageToClient(em, userObject, "Prompt cancelled!");
+						var promptCanceledMessage = new FixedString512Bytes("Prompt cancelled!");
+						ServerChatUtils.SendSystemMessageToClient(em, userObject, ref promptCanceledMessage);
 					}
 					else
 					{
