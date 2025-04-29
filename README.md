@@ -135,7 +135,6 @@ ExpireExchangeAfter = 60
 
 ## Plugin Dependencies
 - [VampireCommandFramework](https://thunderstore.io/c/v-rising/p/deca/VampireCommandFramework/)
-- [Bloodstone](https://thunderstore.io/c/v-rising/p/deca/Bloodstone/)
 
 ### Disclaimer
 This plugin has only been tested in a limited enviroment so far, so beware bugs or other issues that could arise, to report them you can raise an issue here on github or join the [V Rising modding community discord](https://discord.com/invite/QG2FmueAG9) to speak with me directly.
@@ -143,7 +142,7 @@ This plugin has only been tested in a limited enviroment so far, so beware bugs 
 ### Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Community. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 
-> **[Deca](https://github.com/decaprime)** for their work on **Bloodstone** and **VampireCommandFramework**
+> **[Deca](https://github.com/decaprime)** for their work on **VampireCommandFramework**
 
 > **[Odjit](https://github.com/Odjit)** for their work on the **Kindred** suite of plugin.
 
