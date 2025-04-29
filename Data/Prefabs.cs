@@ -171,7 +171,7 @@ public class Prefabs
 		{ new PrefabGUID(1756241788), "Incinerator" },
 		{ new PrefabGUID(-951976780), "Werewolf" },
 		{ new PrefabGUID(-436956599), "Viper" },
-		{ new PrefabGUID(-436956599), "Striker" },
+		{ new PrefabGUID(761646020), "Striker" },
 		{ new PrefabGUID(1451256919), "Peon" },
 		{ new PrefabGUID(1864177126), "Venomblade" }
 	};
