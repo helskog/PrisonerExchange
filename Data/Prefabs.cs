@@ -18,7 +18,7 @@ public class Prefabs
 		{ new PrefabGUID(-338774148), "VBlood" },
 		{ new PrefabGUID(-516976528), "Warrior" },
 		{ new PrefabGUID(-1776904174), "Worker" },
-		{ new PrefabGUID(-1620185637), "Corrupted" }
+		{ new PrefabGUID(-516976528), "Corrupted" }
 	};
 
 	public static Dictionary<PrefabGUID, string> UnitTypes = new Dictionary<PrefabGUID, string>
