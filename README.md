@@ -6,9 +6,7 @@ This is an early release for the Oakveil 1.1 update. You need to use the publish
 Read more information about the update here: https://wiki.vrisingmods.com/user/game_update.html
 
 Direct links for dependencies needed:
-[BepInEx 1.733.2 (RC2)](https://github.com/decaprime/VRising-Modding/releases/tag/1.733.2)
-
-[VampireCommandFramework](https://github.com/Odjit/VampireCommandFramework/releases/tag/1.1)
+[BepInEx 1.733.2 (RC2)](https://github.com/decaprime/VRising-Modding/releases/tag/1.733.2) and [VampireCommandFramework](https://github.com/Odjit/VampireCommandFramework/releases/tag/1.1)
 
 ## Features
 - Sell a prisoner to another user or clan.
