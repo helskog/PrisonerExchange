@@ -73,7 +73,7 @@ internal class UnitSpawnerService
 		{
 			if (!Enabled) return;
 
-			var entities = __instance.__query_2099432189_0.ToEntityArray(Unity.Collections.Allocator.Temp);
+			var entities = __instance.__query_2099432243_0.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			foreach (var entity in entities)
 			{

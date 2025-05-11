@@ -3,26 +3,25 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>PrisonerExchange</AssemblyName>
     <Description>A plugin to swap and sell prisoners.</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.4</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>PrisonerExchange</RootNamespace>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
-    <InformationalVersion>0.1.10+1.Branch.main.Sha.c33d0879382e1a0da34861ec55914ba7e637a80e</InformationalVersion>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.691" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.Core" Version="6.0.0-be.691" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
-    <PackageReference Include="VRising.Unhollowed.Client" Version="1.1.0.9121701" />
+    <PackageReference Include="VRising.Unhollowed.Client" Version="1.1.6.9161201" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="VampireCommandFramework">
-      <HintPath>..\..\..\V-Rising Server\BepInEx\plugins\VampireCommandFramework.dll</HintPath>
+      <HintPath>bin\VampireCommandFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="move /Y &quot;C:\dev\V Rising dev\V-Rising Plugins\Server\PrisonerExchange\bin\Release\net6.0\PrisonerExchange.dll&quot; &quot;C:\dev\V Rising dev\V-Rising Server\BepInEx\plugins&quot;" />
-  </Target>
+  <ItemGroup>
+    <Content Include=".github\workflows\build.yml" />
+  </ItemGroup>
 </Project>
