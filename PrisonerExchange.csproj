@@ -14,8 +14,8 @@
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.691" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.Core" Version="6.0.0-be.691" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
-    <PackageReference Include="VRising.Unhollowed.Client" Version="1.1.6.9161201" />
-    <PackageReference Include="VRising.VampireCommandFramework" Version="0.10.0" />
+    <PackageReference Include="VRising.Unhollowed.Client" Version="1.1.8.9179701" />
+    <PackageReference Include="VRising.VampireCommandFramework" Version="0.10.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".github\workflows\build.yml" />

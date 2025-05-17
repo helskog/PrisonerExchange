@@ -1,3 +1,3 @@
-Version 1.0.4
-- Updated unhollowed assemblies
-- Fixed updated query name from hotfix
+Version 1.0.5
+- Updated dependencies
+- Updated readme

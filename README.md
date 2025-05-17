@@ -1,13 +1,6 @@
 # PrisonerExchange
 A V Rising plugin made to enable trading and swapping prisoners between clans, without the hassle of manually transferring them.
 
-## Early 1.1 Release
-This is an early release for the Oakveil 1.1 update. You need to use the published test version of both BepInEx and VCF to use this at the moment.
-Read more information about the update here: https://wiki.vrisingmods.com/user/game_update.html
-
-Direct links for dependencies needed:
-[BepInEx 1.733.2 (RC2)](https://github.com/decaprime/VRising-Modding/releases/tag/1.733.2) and [VampireCommandFramework](https://github.com/Odjit/VampireCommandFramework/releases/tag/1.1)
-
 ## Features
 - Sell a prisoner to another user or clan.
 - Swap a prisoner for another with a user or clan.
@@ -142,9 +135,6 @@ ExpireExchangeAfter = 60
 
 ## Plugin Dependencies
 - [VampireCommandFramework](https://github.com/Odjit/VampireCommandFramework/releases/tag/1.1)
-
-### Disclaimer
-This plugin has only been tested in a limited enviroment so far, so beware bugs or other issues that could arise, to report them you can raise an issue here on github or join the [V Rising modding community discord](https://discord.com/invite/QG2FmueAG9) to speak with me directly.
 
 ### Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Community. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
