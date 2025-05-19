@@ -11,7 +11,7 @@ using VampireCommandFramework;
 
 namespace PrisonerExchange.Services.Chat;
 
-public class StringBuilders
+public static class StringBuilders
 {
 	public static void AnnounceSale(PendingSale sale)
 	{

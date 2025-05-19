@@ -1,27 +1,17 @@
 ﻿using Unity.Entities;
 using ProjectM.Network;
 using ProjectM;
-using VampireCommandFramework;
 using PrisonerExchange.Extensions;
 
 namespace PrisonerExchange.Models;
 
-public class UserModel
+public class UserModel(Entity entity, User userData)
 {
-	public Entity Entity { get; }
-	public User User { get; }
-	public ulong PlatformId { get; }
-	public string CharacterName { get; }
-	public bool IsAdmin { get; }
-
-	public UserModel(Entity entity, User userData)
-	{
-		Entity = entity;
-		User = userData;
-		PlatformId = userData.PlatformId;
-		CharacterName = userData.CharacterName.ToString();
-		IsAdmin = userData.IsAdmin;
-	}
+	public Entity Entity { get; } = entity;
+	public User User { get; } = userData;
+	public ulong PlatformId { get; } = userData.PlatformId;
+	public string CharacterName { get; } = userData.CharacterName.ToString();
+	public bool IsAdmin { get; } = userData.IsAdmin;
 
 	public bool IsClanLeader
 	{

@@ -11,9 +11,9 @@ using System.Linq;
 using System;
 using Stunlock.Core;
 
-namespace PrisonerExchange.Commands;
+namespace PrisonerExchange.Services;
 
-public class PrisonerService
+public static class PrisonerService
 {
 	/// <summary>
 	/// Gather a list of prisoners owned by a clan / user.
@@ -116,7 +116,7 @@ public class PrisonerService
 				prisoncellEntity.Write(prisonStation);
 
 				// ImprisonedBuff
-				BuffUtil.BuffNPC(e, initiator.Entity, new PrefabGUID(1603329680), -1);
+				BuffUtil.BuffNpc(e, initiator.Entity, new PrefabGUID(1603329680), -1);
 			},
 			cellCenterPosition.y
 			);
@@ -144,10 +144,10 @@ public class PrisonerService
 	/// <summary>
 	/// Swap two prisoners between different prisoncells.
 	/// </summary>
-	public static bool SwapPrisoner(PrisonerModel PrisonerA, PrisonerModel PrisonerB, UserModel initiator)
+	public static bool SwapPrisoner(PrisonerModel prisonerA, PrisonerModel prisonerB, UserModel initiator)
 	{
-		Entity prisonCellA = GetAttachedPrisonCell(PrisonerA);
-		Entity prisonCellB = GetAttachedPrisonCell(PrisonerB);
+		Entity prisonCellA = GetAttachedPrisonCell(prisonerA);
+		Entity prisonCellB = GetAttachedPrisonCell(prisonerB);
 
 		if (prisonCellA == Entity.Null || prisonCellB == Entity.Null)
 		{
@@ -156,18 +156,18 @@ public class PrisonerService
 		}
 
 		// Get prisoner information for spawning new ones.
-		PrisonerModel.PrisonerInformation prisonerInformationA = PrisonerA.Info;
-		PrisonerModel.PrisonerInformation prisonerInformationB = PrisonerB.Info;
+		PrisonerModel.PrisonerInformation prisonerInformationA = prisonerA.Info;
+		PrisonerModel.PrisonerInformation prisonerInformationB = prisonerB.Info;
 
-		if (Core.EntityManager.HasComponent<Imprisoned>(PrisonerA.PrisonerEntity))
-			Core.EntityManager.RemoveComponent<Imprisoned>(PrisonerA.PrisonerEntity);
+		if (Core.EntityManager.HasComponent<Imprisoned>(prisonerA.PrisonerEntity))
+			Core.EntityManager.RemoveComponent<Imprisoned>(prisonerA.PrisonerEntity);
 
-		if (Core.EntityManager.HasComponent<Imprisoned>(PrisonerB.PrisonerEntity))
-			Core.EntityManager.RemoveComponent<Imprisoned>(PrisonerB.PrisonerEntity);
+		if (Core.EntityManager.HasComponent<Imprisoned>(prisonerB.PrisonerEntity))
+			Core.EntityManager.RemoveComponent<Imprisoned>(prisonerB.PrisonerEntity);
 
 		// Kill both prisoners
-		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerA.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
-		StatChangeUtility.KillEntity(Core.EntityManager, PrisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
+		StatChangeUtility.KillEntity(Core.EntityManager, prisonerA.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
+		StatChangeUtility.KillEntity(Core.EntityManager, prisonerB.PrisonerEntity, Entity.Null, 0.0, StatChangeReason.Default);
 
 		// Spawn new prisoners in opposite cells
 		SpawnPrisonerInCell(prisonerInformationA, prisonCellB, initiator);
@@ -179,7 +179,7 @@ public class PrisonerService
 	/// <summary>
 	/// Get attached prison cell entity of a prisoner
 	/// </summary>
-	public static Entity GetAttachedPrisonCell(PrisonerModel prisoner)
+	private static Entity GetAttachedPrisonCell(PrisonerModel prisoner)
 	{
 		if (!prisoner.PrisonerEntity.Has<Imprisoned>())
 			return Entity.Null;

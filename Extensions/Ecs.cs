@@ -8,11 +8,11 @@ namespace PrisonerExchange.Extensions
 {
 	internal static class Ecs
 	{
-		private static EntityManager EM => Core.EntityManager;
+		private static EntityManager Em => Core.EntityManager;
 
 		public static bool Exists(this Entity entity)
 		{
-			return entity != Entity.Null && EM.Exists(entity);
+			return entity != Entity.Null && Em.Exists(entity);
 		}
 
 		public static bool HasValue(this Entity entity)
@@ -22,12 +22,12 @@ namespace PrisonerExchange.Extensions
 
 		public static bool Has<T>(this Entity entity) where T : struct
 		{
-			return EM.HasComponent<T>(entity);
+			return Em.HasComponent<T>(entity);
 		}
 
 		public static bool TryGetComponent<T>(this Entity entity, out T component) where T : struct
 		{
-			if (EM.HasComponent<T>(entity))
+			if (Em.HasComponent<T>(entity))
 			{
 				component = entity.Read<T>();
 				return true;
@@ -38,12 +38,12 @@ namespace PrisonerExchange.Extensions
 
 		public static unsafe T Read<T>(this Entity entity) where T : struct
 		{
-			return EM.GetComponentData<T>(entity);
+			return Em.GetComponentData<T>(entity);
 		}
 
 		public static void Write<T>(this Entity entity, T data) where T : struct
 		{
-			EM.SetComponentData(entity, data);
+			Em.SetComponentData(entity, data);
 		}
 
 		public static unsafe void WriteRaw<T>(this Entity entity, T data) where T : struct
@@ -55,7 +55,7 @@ namespace PrisonerExchange.Extensions
 
 			fixed (byte* p = bytes)
 			{
-				EM.SetComponentDataRaw(entity, ct.TypeIndex, p, size);
+				Em.SetComponentDataRaw(entity, ct.TypeIndex, p, size);
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace PrisonerExchange.Extensions
 		{
 			if (!entity.Has<T>())
 			{
-				EM.AddComponent<T>(entity);
+				Em.AddComponent<T>(entity);
 			}
 		}
 
@@ -95,7 +95,7 @@ namespace PrisonerExchange.Extensions
 		{
 			if (entity.Has<T>())
 			{
-				EM.RemoveComponent<T>(entity);
+				Em.RemoveComponent<T>(entity);
 				return true;
 			}
 			return false;

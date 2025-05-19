@@ -1,30 +1,21 @@
 ﻿using System;
 
-using PrisonerExchange.Models;
+namespace PrisonerExchange.Models;
 
-using Unity.Entities;
-
-namespace PrisonerExchange.Services;
-
-public class PendingSwap
+public class PendingSwap(
+	UserModel seller,
+	UserModel buyer,
+	PrisonerModel prisonera,
+	PrisonerModel prisonerb,
+	double lifetimeSeconds = 120
+)
 {
-	public UserModel Seller { get; }
-	public UserModel Buyer { get; }
+	public UserModel Seller { get; } = seller;
+	public UserModel Buyer { get; } = buyer;
 
-	public PrisonerModel PrisonerA { get; }
-	public PrisonerModel PrisonerB { get; }
+	public PrisonerModel PrisonerA { get; } = prisonera;
+	public PrisonerModel PrisonerB { get; } = prisonerb;
 
-	public DateTime CreatedAt { get; }
-	public double LifetimeSeconds { get; }
-
-	public PendingSwap(UserModel seller, UserModel buyer, PrisonerModel prisonera, PrisonerModel prisonerb, double lifetimeSeconds = 120)
-	{
-		Seller = seller;
-		Buyer = buyer;
-		PrisonerA = prisonera;
-		PrisonerB = prisonerb;
-
-		CreatedAt = DateTime.UtcNow;
-		LifetimeSeconds = lifetimeSeconds;
-	}
+	public DateTime CreatedAt { get; } = DateTime.UtcNow;
+	public double LifetimeSeconds { get; } = lifetimeSeconds;
 }

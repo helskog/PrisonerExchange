@@ -9,7 +9,7 @@ using Unity.Transforms;
 
 namespace PrisonerExchange.Utility;
 
-public class EntityUtil
+public static class EntityUtil
 {
 	public static Entity FindClosestInRadius<T>(Entity player, float radius)
 	{

@@ -18,16 +18,13 @@ using UnityEngine;
 namespace PrisonerExchange.Services;
 
 // All credits to Odjit, kindred-commands for NPC spawning patch / callback function.
-internal class UnitSpawnerService
+internal static class UnitSpawnerService
 {
-	private static Entity empty_entity = new();
-
-	internal const int DEFAULT_MINRANGE = 0;
-	internal const int DEFAULT_MAXRANGE = 0;
+	private static readonly Entity EmptyEntity = new();
 
 	public static Entity SpawnWithCallback(Entity user, PrefabGUID unit, float2 position, float duration, Action<Entity> postActions, float yPosition = -1)
 	{
-		if (yPosition == -1)
+		if (Mathf.Approximately(yPosition, -1))
 		{
 			var translation = Core.EntityManager.GetComponentData<Translation>(user);
 			yPosition = translation.Value.y;
@@ -35,17 +32,17 @@ internal class UnitSpawnerService
 		var pos = new float3(position.x, yPosition, position.y);
 		var usus = Core.Server.GetExistingSystemManaged<UnitSpawnerUpdateSystem>();
 
-		UnitSpawnerReactSystem_Patch.Enabled = true;
+		UnitSpawnerReactSystemPatch.Enabled = true;
 
 		var durationKey = NextKey();
-		usus.SpawnUnit(empty_entity, unit, pos, 1, DEFAULT_MINRANGE, DEFAULT_MAXRANGE, durationKey);
+		usus.SpawnUnit(EmptyEntity, unit, pos, 1, 0, 0, durationKey);
 		PostActions.Add(durationKey, (duration, postActions));
 
 		// Return the newly spawned entity
-		return empty_entity;
+		return EmptyEntity;
 	}
 
-	internal static long NextKey()
+	private static long NextKey()
 	{
 		System.Random r = new();
 		long key;
@@ -62,10 +59,10 @@ internal class UnitSpawnerService
 		return key;
 	}
 
-	internal static Dictionary<long, (float actualDuration, Action<Entity> Actions)> PostActions = [];
+	private static readonly Dictionary<long, (float actualDuration, Action<Entity> Actions)> PostActions = [];
 
 	[HarmonyPatch(typeof(UnitSpawnerReactSystem), nameof(UnitSpawnerReactSystem.OnUpdate))]
-	public static class UnitSpawnerReactSystem_Patch
+	public static class UnitSpawnerReactSystemPatch
 	{
 		public static bool Enabled { get; set; } = false;
 
@@ -102,6 +99,8 @@ internal class UnitSpawnerService
 					actions(entity);
 				}
 			}
+
+			entities.Dispose();
 		}
 	}
 }

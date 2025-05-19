@@ -28,18 +28,28 @@ public static class SwapService
 
 	public static void AddSwap(PendingSwap swap)
 	{
-		SwapsList.Add(swap);
+		lock (SwapsList)
+		{
+			SwapsList.Add(swap);
+		}
+
 		Plugin.Logger.Info("SwapService", $"Created prisoner swap. Initiator={swap.Seller.CharacterName}, Target={swap.Buyer.CharacterName}");
 	}
 
 	public static List<PendingSwap> GetAll()
 	{
-		return SwapsList;
+		lock (SwapsList)
+		{
+			return SwapsList;
+		}
 	}
 
 	public static PendingSwap GetActiveSwap(UserModel user)
 	{
-		return SwapsList.FirstOrDefault(s => s.Seller.PlatformId == user.PlatformId || s.Buyer.PlatformId == user.PlatformId);
+		lock (SwapsList)
+		{
+			return SwapsList.FirstOrDefault(s => s.Seller.PlatformId == user.PlatformId || s.Buyer.PlatformId == user.PlatformId);
+		}
 	}
 
 	public static bool SwapExists(UserModel user)
@@ -97,8 +107,8 @@ public static class SwapService
 				}
 
 				// Trt remove buff from both prisoners
-				BuffUtil.RemoveBuff(ex.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
-				BuffUtil.RemoveBuff(ex.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+				BuffUtil.RemoveBuff(ex.PrisonerA.PrisonerEntity, BuffUtil._electricBuff);
+				BuffUtil.RemoveBuff(ex.PrisonerB.PrisonerEntity, BuffUtil._electricBuff);
 			}
 		}
 	}

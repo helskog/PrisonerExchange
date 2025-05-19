@@ -9,15 +9,15 @@ using UnityEngine.TextCore.Text;
 namespace PrisonerExchange.Utility;
 
 // Credits to bloody core
-public class BuffUtil
+public static class BuffUtil
 {
-	public static EntityManager EM = Core.EntityManager;
-	public static PrefabGUID ELECTRIC_BUFF = new PrefabGUID(1237097606);
+	private static readonly EntityManager Em = Core.EntityManager;
+	public static PrefabGUID _electricBuff = new PrefabGUID(1237097606);
 
-	public const int NO_DURATION = 0;
-	public const int DEFAULT_DURATION = -1;
+	private const int NoDuration = 0;
+	private const int DefaultDuration = -1;
 
-	public static bool BuffNPC(Entity character, Entity user, PrefabGUID buff, int duration = DEFAULT_DURATION)
+	public static bool BuffNpc(Entity character, Entity user, PrefabGUID buff, int duration = DefaultDuration)
 	{
 		if (Core.DebugEventsSystem == null)
 		{
@@ -35,11 +35,11 @@ public class BuffUtil
 			Character = character
 		};
 
-		if (!BuffUtility.TryGetBuff(EM, character, buff, out var buffEntity))
+		if (!BuffUtility.TryGetBuff(Em, character, buff, out var buffEntity))
 		{
 			Core.DebugEventsSystem.ApplyBuff(fromCharacter, buffEvent);
 
-			if (!BuffUtility.TryGetBuff(EM, character, buff, out buffEntity))
+			if (!BuffUtility.TryGetBuff(Em, character, buff, out buffEntity))
 			{
 				Plugin.Logger.Info("BuffUtil", $"Failed to apply buff {buff.GuidHash} to entity {character.Index}.");
 				return false;
@@ -48,7 +48,7 @@ public class BuffUtil
 			buffEntity.TryRemoveComponent<CreateGameplayEventsOnSpawn>();
 			buffEntity.TryRemoveComponent<GameplayEventListeners>();
 
-			if (duration > 0 && duration != DEFAULT_DURATION)
+			if (duration > 0 && duration != DefaultDuration)
 			{
 				if (buffEntity.Has<LifeTime>())
 				{
@@ -57,7 +57,7 @@ public class BuffUtil
 					buffEntity.Write(lifetime);
 				}
 			}
-			else if (duration == NO_DURATION)
+			else if (duration == NoDuration)
 			{
 				if (buffEntity.Has<LifeTime>())
 				{
@@ -79,17 +79,17 @@ public class BuffUtil
 		return false;
 	}
 
-	public static bool RemoveBuff(Entity Character, PrefabGUID Buff)
+	public static bool RemoveBuff(Entity character, PrefabGUID buff)
 	{
-		if (BuffUtility.TryGetBuff(EM, Character, Buff, out var buffEntity))
+		if (BuffUtility.TryGetBuff(Em, character, buff, out var buffEntity))
 		{
-			DestroyUtility.Destroy(EM, buffEntity, DestroyDebugReason.TryRemoveBuff);
+			DestroyUtility.Destroy(Em, buffEntity, DestroyDebugReason.TryRemoveBuff);
 
-			Plugin.Logger.Info("BuffUtil", $"Successfully removed buff {Buff.GuidHash} from entity {Character.Index}.");
+			Plugin.Logger.Info("BuffUtil", $"Successfully removed buff {buff.GuidHash} from entity {character.Index}.");
 			return true;
 		}
 
-		Plugin.Logger.Info("BuffUtil", $"Successfully removed buff {Buff.GuidHash} from entity {Character.Index}.");
+		Plugin.Logger.Info("BuffUtil", $"Successfully removed buff {buff.GuidHash} from entity {character.Index}.");
 		return false;
 	}
 }

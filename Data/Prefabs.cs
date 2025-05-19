@@ -4,9 +4,10 @@ using Stunlock.Core;
 
 namespace PrisonerExchange.Data;
 
-public class Prefabs
+public static class Prefabs
 {
-	public static Dictionary<PrefabGUID, string> BloodTypes = new Dictionary<PrefabGUID, string>
+	
+	public static readonly Dictionary<PrefabGUID, string> BloodTypes = new Dictionary<PrefabGUID, string>
 	{
 		{ new PrefabGUID(804798592), "Brute" },
 		{ new PrefabGUID(524822543), "Creature" },
@@ -21,7 +22,7 @@ public class Prefabs
 		{ new PrefabGUID(-1382693416), "Corrupted" }
 	};
 
-	public static Dictionary<PrefabGUID, string> UnitTypes = new Dictionary<PrefabGUID, string>
+	public static readonly Dictionary<PrefabGUID, string> UnitTypes = new Dictionary<PrefabGUID, string>
 	{
 		{ new PrefabGUID(-2080231735), "Bloodprophet" },
 		{ new PrefabGUID(-2072914343), "Rat" },

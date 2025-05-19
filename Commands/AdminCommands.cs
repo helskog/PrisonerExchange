@@ -28,7 +28,7 @@ internal class AdminCommands
 
 		if (sale != null)
 		{
-			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil._electricBuff);
 
 			SalesService.RemoveSale(sale.Seller);
 			ctx.Reply($"{Markup.Prefix}Removed sale request involving {user.CharacterName}.");
@@ -40,8 +40,8 @@ internal class AdminCommands
 
 		if (swap != null)
 		{
-			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
-			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil._electricBuff);
+			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil._electricBuff);
 
 			SwapService.RemoveSwap(swap.Seller);
 			ctx.Reply($"{Markup.Prefix}Removed swap request involving {user.CharacterName}.");
@@ -60,15 +60,15 @@ internal class AdminCommands
 		var allSales = SalesService.GetAll();
 		foreach (var sale in allSales)
 		{
-			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil._electricBuff);
 		}
 		SalesService.ClearAll();
 
 		var allSwaps = SwapService.GetAll();
 		foreach (var swap in allSwaps)
 		{
-			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
-			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+			BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil._electricBuff);
+			BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil._electricBuff);
 		}
 		SwapService.ClearAll();
 

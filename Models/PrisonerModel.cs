@@ -7,47 +7,39 @@ using Stunlock.Core;
 
 namespace PrisonerExchange.Models;
 
-public class PrisonerModel
+public class PrisonerModel(Entity prisoner)
 {
-	private readonly EntityManager EM = Core.EntityManager;
-	private readonly Entity entity;
-
-	public PrisonerModel(Entity prisoner)
-	{
-		entity = prisoner;
-	}
-
-	public Entity PrisonerEntity => entity;
+	public Entity PrisonerEntity => prisoner;
 
 	public PrisonerInformation Info
 	{
 		get
 		{
-			if (!entity.Exists())
+			if (!prisoner.Exists())
 				return null;
 
-			PrefabGUID prefabGUID = PrefabGUID.Empty;
+			PrefabGUID prefabGuid = PrefabGUID.Empty;
 			BloodConsumeSource bloodInfo = new BloodConsumeSource();
 			string unitType = "Unknown";
 			string bloodType = "Unknown";
 			string bloodQuality = "Unknown";
 
-			if (entity.Has<PrefabGUID>())
+			if (prisoner.Has<PrefabGUID>())
 			{
-				prefabGUID = entity.Read<PrefabGUID>();
-				unitType = Prefabs.UnitTypes.TryGetValue(prefabGUID, out var knownUnitType) ? knownUnitType : "Unknown";
+				prefabGuid = prisoner.Read<PrefabGUID>();
+				unitType = Prefabs.UnitTypes.TryGetValue(prefabGuid, out var knownUnitType) ? knownUnitType : "Unknown";
 			}
 
-			if (entity.Has<BloodConsumeSource>())
+			if (prisoner.Has<BloodConsumeSource>())
 			{
-				bloodInfo = entity.Read<BloodConsumeSource>();
+				bloodInfo = prisoner.Read<BloodConsumeSource>();
 				bloodType = Prefabs.BloodTypes.TryGetValue(bloodInfo.UnitBloodType, out var knownBloodType) ? knownBloodType : "Unknown";
 				bloodQuality = bloodInfo.BloodQuality.ToString("F0");
 			}
 
 			return new PrisonerInformation
 			{
-				PrefabGUID = prefabGUID,
+				PrefabGUID = prefabGuid,
 				BloodInfo = bloodInfo,
 				UnitType = unitType,
 				BloodType = bloodType,

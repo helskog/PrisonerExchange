@@ -134,7 +134,7 @@ internal class SaleCommands
 		Plugin.Logger.Info("UserCommands", $"User '{localuser.CharacterName}' initiated prisoner sale to '{targetuser.CharacterName}' for {price} {Configuration.CurrencyName}.");
 
 		// Buff active request NPC to visualize.
-		BuffUtil.BuffNPC(unitEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
+		BuffUtil.BuffNpc(unitEntity, localuser.Entity, BuffUtil._electricBuff, Configuration.ExpireExchangeAfter);
 
 		// Send message to receiving user.
 		var msg = new FixedString512Bytes(StringBuilders.SalesInfoMessage(newSale));
@@ -164,7 +164,7 @@ internal class SaleCommands
 			return;
 		}
 
-		if (!BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil.ELECTRIC_BUFF))
+		if (!BuffUtil.RemoveBuff(sale.PrisonerEntity, BuffUtil._electricBuff))
 			Plugin.Logger.Error("UserCommands", $"Failed to apply buff to {sale.PrisonerEntity}.");
 
 		SalesService.RemoveSale(localuser);

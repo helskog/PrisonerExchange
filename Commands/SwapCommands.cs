@@ -116,8 +116,8 @@ internal class SwapCommands
 			var swap = new PendingSwap(localuser, targetuser, prisonerA, prisonerB, Configuration.ExpireExchangeAfter);
 			SwapService.AddSwap(swap);
 
-			BuffUtil.BuffNPC(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
-			BuffUtil.BuffNPC(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil.ELECTRIC_BUFF, Configuration.ExpireExchangeAfter);
+			BuffUtil.BuffNpc(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil._electricBuff, Configuration.ExpireExchangeAfter);
+			BuffUtil.BuffNpc(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil._electricBuff, Configuration.ExpireExchangeAfter);
 
 			var msg = new FixedString512Bytes(StringBuilders.SwapInfoMessage(swap));
 			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, ref msg);
@@ -185,8 +185,8 @@ internal class SwapCommands
 		var swapDeclinedMessage = new FixedString512Bytes($"{Markup.Prefix}Your swap request was declined by {swap.Buyer.CharacterName}.");
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, swap.Seller.User, ref swapDeclinedMessage);
 
-		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
-		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil._electricBuff);
+		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil._electricBuff);
 
 		SwapService.RemoveSwap(swap.Seller);
 
@@ -212,8 +212,8 @@ internal class SwapCommands
 			return;
 		}
 
-		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
-		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil.ELECTRIC_BUFF);
+		BuffUtil.RemoveBuff(swap.PrisonerA.PrisonerEntity, BuffUtil._electricBuff);
+		BuffUtil.RemoveBuff(swap.PrisonerB.PrisonerEntity, BuffUtil._electricBuff);
 
 		SwapService.RemoveSwap(swap.Seller);
 

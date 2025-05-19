@@ -10,26 +10,22 @@ using Unity.Entities;
 
 namespace PrisonerExchange.Services;
 
-public class InventoryService
+public static class InventoryService
 {
-	public static PrefabGUID currencyPrefab = new PrefabGUID(int.Parse(Configuration.CurrencyPrefab));
+	private static readonly PrefabGUID CurrencyPrefab = new PrefabGUID(int.Parse(Configuration.CurrencyPrefab));
 
 	// Credits to BloodyCore, Kindred for reference
-	public static AddItemResponse TryAddUserInventoryItem(Entity CharacterEntity, PrefabGUID itemGuid, int stacks)
+	private static AddItemResponse TryAddUserInventoryItem(Entity characterEntity, PrefabGUID itemGuid, int stacks)
 	{
-		if (Core.ServerScriptMapper == null)
-		{
-			Core.ServerScriptMapper = Core.Server.GetExistingSystemManaged<ServerScriptMapper>();
-		}
-
-		return Core.ServerScriptMapper.GetServerGameManager().TryAddInventoryItem(CharacterEntity, itemGuid, stacks);
+		Core.ServerScriptMapper ??= Core.Server.GetExistingSystemManaged<ServerScriptMapper>();
+		return Core.ServerScriptMapper.GetServerGameManager().TryAddInventoryItem(characterEntity, itemGuid, stacks);
 	}
 
 	public static bool AddCurrencyToInventory(UserModel user, int amount)
 	{
 		Entity userCharacterEntity = user.User.LocalCharacter._Entity;
 
-		AddItemResponse response = TryAddUserInventoryItem(userCharacterEntity, currencyPrefab, amount);
+		AddItemResponse response = TryAddUserInventoryItem(userCharacterEntity, CurrencyPrefab, amount);
 		if (response.Success)
 		{
 			return true;
@@ -47,7 +43,7 @@ public class InventoryService
 	{
 		Entity userCharacterEntity = user.User.LocalCharacter._Entity;
 
-		if (InventoryUtilitiesServer.TryRemoveItem(Core.EntityManager, userCharacterEntity, currencyPrefab, amount))
+		if (InventoryUtilitiesServer.TryRemoveItem(Core.EntityManager, userCharacterEntity, CurrencyPrefab, amount))
 		{
 			return true;
 		}
@@ -58,7 +54,7 @@ public class InventoryService
 	public static bool CanAfford(UserModel user, int price)
 	{
 		Entity userCharacterEntity = user.User.LocalCharacter._Entity;
-		int totalCurrency = InventoryUtilities.GetItemAmount(Core.EntityManager, userCharacterEntity, currencyPrefab);
+		int totalCurrency = InventoryUtilities.GetItemAmount(Core.EntityManager, userCharacterEntity, CurrencyPrefab);
 		Plugin.Logger.Info("InventoryService", $"Currency in inventory: {totalCurrency}");
 
 		if (totalCurrency >= price)

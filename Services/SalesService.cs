@@ -14,8 +14,8 @@ namespace PrisonerExchange.Services;
 
 public static class SalesService
 {
-	private static readonly List<PendingSale> SalesList = new List<PendingSale>();
-	private static Timer CleanupTimer;
+	private static readonly List<PendingSale> SalesList = new();
+	private static readonly Timer CleanupTimer;
 
 	static SalesService()
 	{
@@ -71,11 +71,11 @@ public static class SalesService
 	{
 		lock (SalesList)
 		{
-			return SalesService.GetAll().Any(sale => sale.Seller.PlatformId == user.PlatformId);
+			return GetAll().Any(sale => sale.Seller.PlatformId == user.PlatformId);
 		}
 	}
 
-	public static void RemoveExpiredSales()
+	private static void RemoveExpiredSales()
 	{
 		lock (SalesList)
 		{

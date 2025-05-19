@@ -5,13 +5,12 @@ using Unity.Entities;
 using PrisonerExchange.Models;
 using ProjectM.Network;
 using VampireCommandFramework;
-using ProjectM;
 
 namespace PrisonerExchange.Utility;
 
-public class UserUtil
+public static class UserUtil
 {
-	public static UserModel[] All
+	private static UserModel[] All
 	{
 		get
 		{
@@ -44,7 +43,7 @@ public class UserUtil
 		return new UserModel(userEntity, userData);
 	}
 
-	public static UserModel GetUserByPlatformId(ulong platformId)
+	private static UserModel GetUserByPlatformId(ulong platformId)
 	{
 		return All.FirstOrDefault(u => u.PlatformId == platformId);
 	}

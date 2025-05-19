@@ -13,7 +13,7 @@ public static class PromptManager
         public Timer Timeout;
     }
 
-    private static readonly Dictionary<ulong, PromptData> storedPrompts = new();
+    private static readonly Dictionary<ulong, PromptData> StoredPrompts = new();
 
     public static void RequestInput(ulong userId, Action<string> onInput, Action onTimeout, int timeoutSeconds = 30)
     {
@@ -28,7 +28,7 @@ public static class PromptManager
         timer.AutoReset = false;
         timer.Start();
 
-        storedPrompts[userId] = new PromptData
+        StoredPrompts[userId] = new PromptData
         {
             OnInput = onInput,
             OnTimeout = onTimeout,
@@ -38,25 +38,25 @@ public static class PromptManager
 
     public static bool TryHandleInput(ulong userId, string message)
     {
-        if (!storedPrompts.TryGetValue(userId, out var prompt))
+        if (!StoredPrompts.TryGetValue(userId, out var prompt))
         {
             return false;
         }
 
         prompt.Timeout.Stop();
-        storedPrompts.Remove(userId);
+        StoredPrompts.Remove(userId);
         prompt.OnInput?.Invoke(message);
         return true;
     }
 
     public static void CancelPrompt(ulong userId)
     {
-        if (storedPrompts.TryGetValue(userId, out var prompt))
+        if (StoredPrompts.TryGetValue(userId, out var prompt))
         {
             prompt.Timeout.Stop();
-            storedPrompts.Remove(userId);
+            StoredPrompts.Remove(userId);
         }
     }
 
-    public static bool IsWaiting(ulong userId) => storedPrompts.ContainsKey(userId);
+    public static bool IsWaiting(ulong userId) => StoredPrompts.ContainsKey(userId);
 }
