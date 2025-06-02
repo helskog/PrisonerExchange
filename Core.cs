@@ -10,7 +10,18 @@ internal static class Core
 	public static EntityManager EntityManager { get; } = Server.EntityManager;
 	public static GameDataSystem GameDataSystem { get; } = Server.GetExistingSystemManaged<GameDataSystem>();
 	public static DebugEventsSystem DebugEventsSystem { get; internal set; }
-	public static ServerScriptMapper ServerScriptMapper { get; internal set; }
+	public static ServerGameManager ServerGameManager => ServerScriptMapper.GetServerGameManager();
+	public static PrefabCollectionSystem PrefabCollection { get; } = Server.GetExistingSystemManaged<PrefabCollectionSystem>();
+
+	static ServerScriptMapper serverScriptMapper;
+	public static ServerScriptMapper ServerScriptMapper
+	{
+		get
+		{
+			serverScriptMapper ??= Server.GetExistingSystemManaged<ServerScriptMapper>();
+			return serverScriptMapper;
+		}
+	}
 
 	private static bool hasInitialized;
 
@@ -19,12 +30,11 @@ internal static class Core
 		if (hasInitialized) return;
 
 		DebugEventsSystem = Server.GetExistingSystemManaged<DebugEventsSystem>();
-		ServerScriptMapper = Server.GetExistingSystemManaged<ServerScriptMapper>();
 
 		hasInitialized = true;
 	}
 
-	private static World GetWorld()
+	private static World? GetWorld()
 	{
 		foreach (var world in World.s_AllWorlds)
 		{

@@ -133,9 +133,6 @@ ExpireExchangeAfter = 60
 
 </details>
 
-## Plugin Dependencies
-- [VampireCommandFramework](https://github.com/Odjit/VampireCommandFramework/releases/tag/1.1)
-
 ### Credits
 Some crucial parts of the plugin is either derived or copied from existing open-source resources in the V Rising Modding Community. Although not mentioned below, I also want to thank the server owners and other community members in the modding community discord for helping out where needed.
 

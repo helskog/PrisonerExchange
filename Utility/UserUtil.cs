@@ -34,7 +34,7 @@ public static class UserUtil
 
 	public static UserModel GetCurrentUser(ChatCommandContext ctx)
 	{
-		return UserUtil.GetUserByPlatformId(ctx.User.PlatformId);
+		return GetUserByPlatformId(ctx.User.PlatformId);
 	}
 
 	public static UserModel ToUserModel(Entity userEntity)

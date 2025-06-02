@@ -12,7 +12,7 @@ namespace PrisonerExchange.Utility;
 public static class BuffUtil
 {
 	private static readonly EntityManager Em = Core.EntityManager;
-	public static PrefabGUID _electricBuff = new PrefabGUID(1237097606);
+	public static PrefabGUID _electricBuff = new(1237097606);
 
 	private const int NoDuration = 0;
 	private const int DefaultDuration = -1;

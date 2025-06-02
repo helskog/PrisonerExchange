@@ -1,4 +1,5 @@
-﻿using PrisonerExchange.Extensions;
+﻿using MortiumGames.Utils;
+using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
 using PrisonerExchange.Services.Chat;
@@ -119,8 +120,12 @@ internal class SwapCommands
 			BuffUtil.BuffNpc(prisonerA.PrisonerEntity, targetuser.Entity, BuffUtil._electricBuff, Configuration.ExpireExchangeAfter);
 			BuffUtil.BuffNpc(prisonerB.PrisonerEntity, localuser.Entity, BuffUtil._electricBuff, Configuration.ExpireExchangeAfter);
 
+			// Message other user	
 			var msg = new FixedString512Bytes(StringBuilders.SwapInfoMessage(swap));
 			ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, ref msg);
+
+			// Notify incoming offer
+			SequenceUtils.SpawnSequence(targetuser.Entity, new(-1177491659), 5);
 
 			CooldownTracker.SetCooldown(localuser.PlatformId, "swap");
 

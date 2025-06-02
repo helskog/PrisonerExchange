@@ -6,7 +6,7 @@ namespace PrisonerExchange.Data;
 
 public static class Prefabs
 {
-	
+
 	public static readonly Dictionary<PrefabGUID, string> BloodTypes = new Dictionary<PrefabGUID, string>
 	{
 		{ new PrefabGUID(804798592), "Brute" },

@@ -8,8 +8,8 @@ internal class Configuration
 	internal static bool SwappingEnabled { get; private set; }
 
 	internal static bool AnnounceExchange { get; private set; }
-	internal static string CurrencyPrefab { get; private set; }
-	internal static string CurrencyName { get; private set; }
+	internal static string? CurrencyPrefab { get; private set; }
+	internal static string? CurrencyName { get; private set; }
 	internal static int MinimumSalePrice { get; private set; }
 	internal static int MaximumSalePrice { get; private set; }
 

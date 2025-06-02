@@ -17,8 +17,7 @@ public static class InventoryService
 	// Credits to BloodyCore, Kindred for reference
 	private static AddItemResponse TryAddUserInventoryItem(Entity characterEntity, PrefabGUID itemGuid, int stacks)
 	{
-		Core.ServerScriptMapper ??= Core.Server.GetExistingSystemManaged<ServerScriptMapper>();
-		return Core.ServerScriptMapper.GetServerGameManager().TryAddInventoryItem(characterEntity, itemGuid, stacks);
+		return Core.ServerGameManager.TryAddInventoryItem(characterEntity, itemGuid, stacks);
 	}
 
 	public static bool AddCurrencyToInventory(UserModel user, int amount)

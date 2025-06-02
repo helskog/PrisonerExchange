@@ -10,6 +10,7 @@ using PrisonerExchange.Extensions;
 using System.Linq;
 using System;
 using Stunlock.Core;
+using MortiumGames.Utils;
 
 namespace PrisonerExchange.Services;
 
@@ -97,8 +98,10 @@ public static class PrisonerService
 					Core.EntityManager.SetComponentData(e, blood);
 				}
 
-				Imprisoned imprisoned = new Imprisoned();
-				imprisoned.PrisonCellEntity = prisoncellEntity;
+				Imprisoned imprisoned = new()
+				{
+					PrisonCellEntity = prisoncellEntity
+				};
 
 				// Thanks Dawiss
 				BehaviourTreeState behaviourTreeState = e.Read<BehaviourTreeState>();
@@ -117,6 +120,7 @@ public static class PrisonerService
 
 				// ImprisonedBuff
 				BuffUtil.BuffNpc(e, initiator.Entity, new PrefabGUID(1603329680), -1);
+				SequenceUtils.SpawnSequence(e, SequenceUtils.Smite, 5);
 			},
 			cellCenterPosition.y
 			);

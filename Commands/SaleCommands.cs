@@ -1,4 +1,5 @@
-﻿using PrisonerExchange.Extensions;
+﻿using MortiumGames.Utils;
+using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
 using PrisonerExchange.Services;
 using PrisonerExchange.Services.Chat;
@@ -139,6 +140,9 @@ internal class SaleCommands
 		// Send message to receiving user.
 		var msg = new FixedString512Bytes(StringBuilders.SalesInfoMessage(newSale));
 		ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, targetuser.User, ref msg);
+
+		// Notify incoming offer
+		SequenceUtils.SpawnSequence(targetuser.Entity, new(-1177491659), 5);
 
 		// Inform sender that the offer has been sent.
 		var informMessage = new FixedString512Bytes($"{Markup.Prefix}Request sent to user {targetuser.CharacterName}");

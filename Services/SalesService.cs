@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Timers;
-
-using PrisonerExchange.Extensions;
+﻿using PrisonerExchange.Extensions;
 using PrisonerExchange.Models;
-
+using PrisonerExchange.Utility;
 using ProjectM;
 
 using Unity.Collections;
+
+using Timer = System.Timers.Timer;
 
 namespace PrisonerExchange.Services;
 
@@ -79,17 +76,17 @@ public static class SalesService
 	{
 		lock (SalesList)
 		{
-			foreach (var expired in SalesList.Where(sale => (DateTime.UtcNow - sale.CreatedAt).TotalSeconds >= sale.LifetimeSeconds).ToList())
+			foreach (var ex in SalesList.Where(sale => (DateTime.UtcNow - sale.CreatedAt).TotalSeconds >= sale.LifetimeSeconds).ToList())
 			{
 				// Notify players
-				var expiredSellerMessage = new FixedString512Bytes($"{Markup.Prefix}Your prisoner exchange request to {expired.Buyer.CharacterName} has expired.");
-				var expiredBuyerMessage = new FixedString512Bytes($"{Markup.Prefix}The prisoner exchange request from {expired.Seller.CharacterName} has expired.");
+				var expiredSellerMessage = new FixedString512Bytes($"{Markup.Prefix}Your prisoner exchange request to {ex.Buyer.CharacterName} has expired.");
+				var expiredBuyerMessage = new FixedString512Bytes($"{Markup.Prefix}The prisoner exchange request from {ex.Seller.CharacterName} has expired.");
 
-				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Seller.User, ref expiredSellerMessage);
+				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Seller.User, ref expiredSellerMessage);
+				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, ex.Buyer.User, ref expiredBuyerMessage);
 
-				ServerChatUtils.SendSystemMessageToClient(Core.EntityManager, expired.Buyer.User, ref expiredBuyerMessage);
-
-				SalesList.Remove(expired);
+				SalesList.Remove(ex);
+				BuffUtil.RemoveBuff(ex.PrisonerEntity, BuffUtil._electricBuff);
 			}
 		}
 	}
